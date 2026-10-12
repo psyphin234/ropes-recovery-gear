@@ -1,4 +1,4 @@
-/* Ropes & Recovery Gear. Colours follow psyphin.co.za (css/style.css there);
+/* Ropes and Shackles. Colours follow psyphin.co.za (css/style.css there);
    based on the SA Towing Check stylesheet, so the tools look the same. */
 :root {
   --bg: #020203;
@@ -2339,7 +2339,7 @@ select:focus {
   }
 }
 
-/* ============================================================ Ropes & Recovery Gear */
+/* ============================================================ Ropes and Shackles */
 
 .tone-pass { --tone: var(--pass); }
 .tone-warn { --tone: var(--warn); }

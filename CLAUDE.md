@@ -1,4 +1,4 @@
-# Ropes & Recovery Gear
+# Ropes and Shackles
 
 Static page for 4x4 **kinetic recovery gear**, part of the PsyPhin site: what a snatch puts through a snatch strap or kinetic rope and its shackles, which strap or rope suits the two vehicles, and what the three "safety straps" are each for (safety lanyard, tree protector, bridle). Started 2026-10-12, in the same design as the winching page (`../Winch_Calc`, https://winching.psyphin.co.za/), reusing the strap and kinetic material that page dropped (its commit 8565449 and before).
 
@@ -6,7 +6,7 @@ Repo `psyphin234/ropes-recovery-gear` (public), GitHub Pages from `main` / root,
 
 **Address: https://ropes.psyphin.co.za/** (the `CNAME` file here, plus the Afrihost CNAME `ropes.psyphin.co.za` → `psyphin234.github.io`, which was already in place). Both pages carry `<link rel="canonical">` and Open Graph tags for it; no share image yet.
 
-**Card on psyphin.co.za** (Tools section) since 2026-10-12, at the owner's request: titled **Ropes and Shackles**, amber "Under construction" tag, image `assets/img/projects/ropes-recovery-gear.jpg` there (this page's scene rendered at 800x450, kinetic rope tight, extra sky for 16:9). Edit it in that repo's `projects.js`.
+**Card on psyphin.co.za** (Tools section) since 2026-10-12, at the owner's request: titled **Ropes and Shackles** (the page's own name too, since 2026-10-12; it was "Ropes & Recovery Gear"; the repo and the `ropes-recovery-v1` key keep the old name), amber "Under construction" tag, image `assets/img/projects/ropes-recovery-gear.jpg` there (this page's scene rendered at 800x450, kinetic rope tight, extra sky for 16:9). Edit it in that repo's `projects.js`.
 
 **Danger warnings (owner's requirement, 2026-10-12):** the site must say plainly that recovery is dangerous, that it's for information only, and that judgement on the scene overrides it. That's the red `.danger` box under the intro on both pages, the line under every verdict, the disclaimer (no liability) and the footer. Keep them.
 
