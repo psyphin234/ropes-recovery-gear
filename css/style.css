@@ -2715,3 +2715,14 @@ select:focus {
 }
 
 .verdict-warn { color: var(--text); font-weight: 600; }
+
+/* strap or rope strength: SECURETECH's factors of safety on one bar */
+.rg-band--under { background: color-mix(in srgb, var(--fail) 35%, transparent); }
+.rg-band--low { background: color-mix(in srgb, var(--warn) 55%, transparent); }
+.rg-band--rec { background: color-mix(in srgb, var(--pass) 55%, transparent); }
+.rg-sw--under { background: color-mix(in srgb, var(--fail) 35%, transparent); }
+.rg-sw--low { background: color-mix(in srgb, var(--warn) 55%, transparent); }
+.rg-sw--rec { background: color-mix(in srgb, var(--pass) 55%, transparent); }
+.rg-key-you { display: inline-block; width: 3px; height: 14px; margin-right: 8px; background: #e6ebef; border-radius: 2px; }
+.rg-legend { margin-top: 6px; }
+.speed-hint { margin: 4px 0 0; }

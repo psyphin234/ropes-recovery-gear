@@ -12,7 +12,7 @@
   const { el, externalLink } = U;
 
   const GROUPS = [
-    { category: "maker", title: "Manufacturers", intro: "Figures and instructions published by strap, rope, shackle and winch makers. South African sources come first, SECURETECH above all; other makers fill in what it doesn't publish online. Your own gear's label or manual beats these." },
+    { category: "maker", title: "Manufacturers", intro: "Figures and instructions published by strap, rope, shackle and winch makers. South African sources come first, SECURETECH above all: it is made in Randburg by Special Industrial Supplies to ISO 9001, with straps made and tested to SANS 94 and EN 1492 (its company profile). Its Recovery Handbook, Buyers Guide and shackle and soft shackle instructions are PDFs SECURETECH supplies; other makers fill in only what SECURETECH doesn't publish. Your own gear's label or manual beats these." },
     { category: "standard", title: "Standards", intro: "Australia's mandatory standard for recovery straps, used only where no South African source publishes anything: we found no South African equivalent." },
     { category: "calculation", title: "This site's calculations", intro: "Plain physics (statics and energy) applied by this site. Not from a source as such, so they're listed separately and labelled where they're used." },
   ];

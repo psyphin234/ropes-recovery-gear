@@ -31,6 +31,8 @@ The owner has been to SECURETECH's warehouse (South Africa), seen its manufactur
 
 **No Australian training advice** (owner, 2026-10-12: South Africa has no 4x4 training authority). The `training` rule cites SECURETECH's handbook page ("attend a professional 4×4 recovery course"), not the Australian standard.
 
+**SECURETECH documents (supplied by the owner, 2026-10-12, not online):** Recovery Handbook (© 2016, 18 pp; request page linked), Recovery Kit Buyers Guide v2, User Instructions: Shackles, Soft Shackle Users Guide, and the Special Industrial Supplies company profile. Kept out of the repo (not ours to republish); cited as `stHandbook`, `stBuyers`, `stShackleGuide`, `stSoftGuide`. From them: strap/rope strength by SECURETECH's factors of safety on the **stuck vehicle's** mass (2:1, 3:1, 4:1 noted, 4:1 recommended; replaces the Australian 2–3× and Factor 55's 4–6×), 18 km/h suggested for vehicles of similar mass (`snatch-speed`; the page's model holds the stuck vehicle still, so at 18 km/h it can show more force than a real snatch), shackle factor of safety 6:1 and 50% at a 90° side pull, lanyards on two loose ring hitches, not on the strap's own point, 1.4 or 1.8 m, bridles ≥ 3.5 m and never pull more than 60° off the centre line, tree protector > 75 mm wide and 2–5 m, strap care (10% damage = 50% capacity lost; rest 8 h per 10% stretch).
+
 **Metric only on the page:** sizes in mm and m, strengths in kg and t. Makers' lb/inch figures stay only inside quotes; data keeps them as published (`breakLb`) and converts.
 
 ## Sources used (all in data.js, read 2026-10-12)

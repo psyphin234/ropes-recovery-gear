@@ -28,30 +28,23 @@
   }
 
   /*
-   * The breaking strength the standard (straps) or the maker (kinetic ropes)
-   * asks for, from the lighter vehicle's mass. Winch rope: none.
-   * Returns { minKg, maxKg, ruleId, heavy: { minKg, maxKg } | null } or null.
+   * The breaking strength SECURETECH asks for, from the stuck vehicle's mass:
+   * its lowest noted factor of safety (2:1) and the one it recommends (4:1).
+   * Winch rope: none. Returns { ruleId, min, rec, minKg, recKg } or null.
    */
-  function sizeRange(id, lighterKg) {
+  function sizeRange(id, stuckKg) {
     const g = gear(id);
-    if (!g || !g.sizeRule || !(lighterKg > 0)) return null;
+    if (!g || !g.sizeRule || !(stuckKg > 0)) return null;
     const p = D.rule(g.sizeRule).params;
-    return {
-      ruleId: g.sizeRule,
-      min: p.min,
-      max: p.max,
-      minKg: lighterKg * p.min,
-      maxKg: lighterKg * p.max,
-      heavy: p.heavyMin ? { min: p.heavyMin, max: p.heavyMax, minKg: lighterKg * p.heavyMin, maxKg: lighterKg * p.heavyMax } : null,
-    };
+    return { ruleId: g.sizeRule, min: p.min, rec: p.recommended, minKg: stuckKg * p.min, recKg: stuckKg * p.recommended };
   }
 
-  // Where a breaking strength sits against a range: "under", "in" or "over".
+  // Where a breaking strength sits: "under" the lowest noted factor, "low" (under the recommended one) or "ok".
   function rangeVerdict(mbsKg, range) {
     if (!range) return null;
     if (mbsKg < range.minKg - 0.5) return "under";
-    if (mbsKg > range.maxKg + 0.5) return "over";
-    return "in";
+    if (mbsKg < range.recKg - 0.5) return "low";
+    return "ok";
   }
 
   /*
@@ -128,7 +121,7 @@
       size: s.size,
       ratedWllKg: s.wllT * 1000,
       wllKg: keep === null ? 0 : s.wllT * 1000 * keep,
-      breakKg: null, // SECURETECH lists the WLL only
+      breakKg: s.wllT * 1000 * D.rule("shackle-ratings").params.designFactor, // SECURETECH: 6:1
       keep,
     }));
     const soft = D.softShackles.map((s) => ({

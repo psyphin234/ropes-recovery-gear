@@ -89,21 +89,19 @@
   });
 
   // ------------------------------------------------------------ sizing
-  test("strap standard: 2 to 3 × the lighter vehicle", () => {
+  test("SECURETECH sizing: 2:1 lowest noted, 4:1 recommended, on the stuck vehicle; none for winch rope", () => {
     const r = C.sizeRange("strap", 2900);
-    eq(r.minKg, 5800, "min");
-    eq(r.maxKg, 8700, "max");
-    eq(C.rangeVerdict(8000, r), "in", "8 t");
+    eq(r.minKg, 5800, "2:1");
+    eq(r.recKg, 11600, "4:1");
+    eq(C.rangeVerdict(12000, r), "ok", "12 t");
+    eq(C.rangeVerdict(8000, r), "low", "8 t");
     eq(C.rangeVerdict(5000, r), "under", "5 t");
-    eq(C.rangeVerdict(11000, r), "over", "11 t");
+    eq(C.sizeRange("kinetic", 2000).recKg, 8000, "kinetic rope too");
+    eq(C.sizeRange("static", 2000), null, "winch rope");
   });
 
-  test("Factor 55: 4 to 6 × for kinetic ropes, 2 to 4 × for heavy vehicles; none for winch rope", () => {
-    const r = C.sizeRange("kinetic", 2000);
-    eq(r.minKg, 8000, "min");
-    eq(r.maxKg, 12000, "max");
-    eq(r.heavy.minKg, 4000, "heavy min");
-    eq(C.sizeRange("static", 2000), null, "winch rope");
+  test("SECURETECH's suggested speed is in data", () => {
+    eq(D.rule("snatch-speed").params.suggestedKmh, 18, "18 km/h");
   });
 
   // ------------------------------------------------------------ the kinetic model
@@ -167,7 +165,7 @@
     const s = C.shackles(45);
     const g = s.find((x) => x.id === "bow-4.75");
     near(g.wllKg, 4750 * 0.7, 1e-9, "4.75 t at 45°");
-    eq(g.breakKg, null, "no published breaking strength");
+    near(g.breakKg, 4750 * 6, 1e-9, "6:1 factor of safety");
     const f = s.find((x) => x.id === "f55-3/8");
     near(f.wllKg, C.lbToKg(8700), 1e-9, "soft WLL");
     eq(f.sideUnknown, true, "flagged: no side-load figure");
