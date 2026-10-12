@@ -23,7 +23,7 @@ Plain HTML/CSS/vanilla JS, classic scripts (no modules, no build step), so `inde
 
 ## Source order: South Africa first (owner, 2026-10-12)
 
-South African sources take preference, SECURETECH above all. Australian sources (the strap standard, Bushranger) only where no South African source publishes anything; other makers fill gaps the same way. Every source in data.js has a `country`; sources.html lists Manufacturers before Standards and puts ZA-led rules and sources first.
+South African sources take preference, SECURETECH above all. Australian sources (the strap standard, Bushranger) only where no South African source publishes anything; other makers fill gaps the same way. The page and README descriptions don't call any source Australian (owner, 2026-10-12): the Australian sources stay, named without the country. Every source in data.js has a `country`; sources.html lists Manufacturers before Standards and puts ZA-led rules and sources first.
 
 ## SECURETECH is the lead source; metric only (owner's calls, 2026-10-12)
 
