@@ -2362,7 +2362,7 @@ select:focus {
 .sc--strap .sc-strap { stroke: #e8e2d0; stroke-width: 6; }
 .sc--kinetic .sc-strap { stroke: #e0a83a; stroke-width: 5; stroke-dasharray: 2 1.5; }
 .sc--static .sc-strap { stroke: #7fb0de; stroke-width: 2.6; }
-.sc-damper { fill: #c8452c; stroke: #8d2c1a; stroke-width: 1.5; }
+.sc-lanyard { fill: none; stroke: #ff8a3d; stroke-width: 3.2; stroke-linecap: round; }
 .sc-shackle { fill: none; stroke: #c8d1da; stroke-width: 2.5; }
 .sc-tag { fill: #1a1405; font-family: var(--font-display); font-weight: 700; font-size: 20px; }
 .sc-gear { fill: #1a1405; font-family: var(--font-body); font-size: 14px; font-weight: 600; }
@@ -2648,7 +2648,7 @@ select:focus {
 .so-zone { fill: color-mix(in srgb, var(--fail) 7%, transparent); stroke: var(--fail); stroke-width: 1.5; stroke-dasharray: 6 4; }
 .so-veh { fill: #2c3a48; stroke: #8fa3b5; stroke-width: 1.5; }
 .so-strap { stroke: #e8e2d0; stroke-width: 3; }
-.so-damper { fill: #c8452c; }
+.so-lanyard { fill: none; stroke: #ff8a3d; stroke-width: 2; stroke-linecap: round; }
 .so-dim { stroke: var(--text-muted); stroke-width: 1.2; }
 .so-text { fill: var(--text); font-family: var(--font-body); font-size: 12px; font-weight: 600; }
 .so-text--muted { fill: var(--text-muted); font-weight: 400; }

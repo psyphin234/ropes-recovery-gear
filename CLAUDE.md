@@ -1,6 +1,6 @@
 # Ropes & Recovery Gear
 
-Static page for 4x4 **kinetic recovery gear**, part of the PsyPhin site: what a snatch puts through a snatch strap or kinetic rope and its shackles, which strap or rope suits the two vehicles, and what the three "safety straps" are each for (damper, tree protector, bridle). Started 2026-10-12, in the same design as the winching page (`../Winch_Calc`, https://winching.psyphin.co.za/), reusing the strap and kinetic material that page dropped (its commit 8565449 and before).
+Static page for 4x4 **kinetic recovery gear**, part of the PsyPhin site: what a snatch puts through a snatch strap or kinetic rope and its shackles, which strap or rope suits the two vehicles, and what the three "safety straps" are each for (safety lanyard, tree protector, bridle). Started 2026-10-12, in the same design as the winching page (`../Winch_Calc`, https://winching.psyphin.co.za/), reusing the strap and kinetic material that page dropped (its commit 8565449 and before).
 
 Repo `psyphin234/ropes-recovery-gear` (public), GitHub Pages from `main` / root, since 2026-10-12. Push to `main` to deploy (ask the owner first); check with `gh api repos/psyphin234/ropes-recovery-gear/pages/builds/latest`.
 
@@ -18,17 +18,21 @@ Plain HTML/CSS/vanilla JS, classic scripts (no modules, no build step), so `inde
 
 - **Standards, manufacturers' published data and instructions, and physics only. No broscience:** no forum, club, retailer-blog or "everyone says" figures.
 - Every number lives in `js/data.js` as a rule's `params`, next to its sources, the exact words quoted from the source (`quote`) and a `checked` date. Don't hard-code 2–3×, 20%, 1.5× etc. elsewhere.
-- Where nothing citable exists, add a `gaps` entry and say "no published figure" on the page. Current gaps: speed, how much weaker a wet strap is, what a damper absorbs, each strap's stretch curve, your recovery points' rating, a WLL for tree protectors, soft shackle side loading.
+- Where nothing citable exists, add a `gaps` entry and say "no published figure" on the page. Current gaps: speed, how much weaker a wet strap is, how to fit a safety lanyard, each strap's stretch curve, your recovery points' rating, a WLL for tree protectors, soft shackle side loading.
 - Rule `category`: standard | maker | calculation. **calculation** = this site's own physics; it must cite `physics` and say so where shown.
 
 ## Sources used (all in data.js, read 2026-10-12)
 
-- **Australian standard**, Consumer Goods (Motor Vehicle Recovery Straps) Safety Standard 2017 (F2017L01560), read from the legislation's Word file: strap MBS 2–3 × GVM, lighter of the two vehicles; strength and stretch drop when soaked; a damper/bag/blanket must be draped over the strap; the tow-ball warning. It never mentions ropes; nothing says it excludes them (the winching page's old "excludes rope, wire, chain" claim was not found in the text, so it isn't used).
+- **Australian standard**, Consumer Goods (Motor Vehicle Recovery Straps) Safety Standard 2017 (F2017L01560), read from the legislation's Word file: strap MBS 2–3 × GVM, lighter of the two vehicles; strength and stretch drop when soaked; the tow-ball warning. It never mentions ropes; nothing says it excludes them (the winching page's old "excludes rope, wire, chain" claim was not found in the text, so it isn't used).
 - **Bushranger** strap sheet (via Snowys; the PDF has no text layer for the cover, the text was pulled from its streams): 9 m nylon, "Stretch Factor: 20%"; stand at least 1.5 × the length of the "upstretched" strap (their spelling; the page uses the stretched length, the longer reading); never exceed the strap's MBS, the recovery point or the shackles' WLL; never join straps with a D or bow shackle; equaliser straps spread the load; strap life 10 recoveries.
 - **Factor 55** literature on WARN's site: kinetic rope stretches up to 30%; rope MBS 4:1–6:1 to GVWR (2:1–4:1 for heavy vehicles), lighter vehicle, too large won't stretch; Extreme Duty soft shackles and kinetic rope bridles ("Maximum breaking strength", WLL = ÷ 5).
 - **Samson** AmSteel-Blue: elastic elongation 0.96% at 30% of break (the page's winch-rope stiffness, carried on in a straight line to ~3.2% at break); warning statement: shock loading voids working loads, never stand in line with a rope under tension.
 - **Crosby**: G-209 WLL table (6:1); 2022 catalogue p. 362 (centre the load in the bow, one leg on the pin, don't pinch synthetic slings) and p. 364 (side loading chart 100/85/75/70/60/55/50%; never exceed 120° included angle).
-- **WARN**: Basic Guide to Winch Rigging (damper midway before tension; hook up low on the anchor; never wrap the rope back onto itself); Epic tree trunk protectors 7 200 / 14 400 / 30 000 lb breaking strength, no WLL.
+- **WARN**: Basic Guide to Winch Rigging (hook up low on the anchor; never wrap the rope back onto itself); Epic tree trunk protectors 7 200 / 14 400 / 30 000 lb breaking strength, no WLL.
+
+## No dampers (owner's call, 2026-10-12)
+
+The owner doesn't use recovery dampers or blankets: no references to them on this page or the winching page. The recoil job is covered by **safety lanyards used correctly** (rule `safety-lanyard`, SECURETECH: tied to the strap, one at each end, so failed parts are held). No maker found publishes how to fit one (where to tie it, slack, rating): that's the `lanyard` gap; if the owner supplies a maker's sheet or their method with a source, add it there. Note the Australian strap standard itself requires strap instructions to mention a damper/bag/blanket (s 9(2)(e)); that requirement is deliberately not shown.
 
 ## The model (rule `kinetic-model`, physics)
 
@@ -37,13 +41,13 @@ The strap is a straight-line spring that reaches its MBS at its rated stretch: k
 ## The page (one stage card)
 
 1. **Try:** example chips (`scenarios`, made-up figures).
-2. **Scene** (`V.scene()`): side view, stuck vehicle sunk in sand on the left, recovery vehicle on the right, strap between with a damper on its middle. Stuck mass, recovery mass, strap MBS and length are HTML overlays on the picture; under 860 px `placeFields()` moves them below it. The strap is drawn to scale along its length, so its stretch shows true. Playback: slack phase (illustration) then the spring; if it breaks, the halves fly back and the damper drops.
+2. **Scene** (`V.scene()`): side view, stuck vehicle sunk in sand on the left, recovery vehicle on the right, strap between with a safety lanyard at each end. Stuck mass, recovery mass, strap MBS and length are HTML overlays on the picture; under 860 px `placeFields()` moves them below it. The strap is drawn to scale along its length, so its stretch shows true. Playback: slack phase (illustration) then the spring; if it breaks, the halves fly back, held by the lanyards.
 3. **Controls:** what's on the vehicles (snatch strap / kinetic rope / winch rope (static)), speed slider 1–30 km/h.
 4. **Verdict** with balance bars: peak force against each limit, with the peak marked on each; fix button "Keep under N km/h" or "Use a kinetic rope".
 5. **The snatch, moment by moment:** force dial (marks for each limit), force-over-time chart, Play (5 s, slowed down), live readouts.
 6. **Strap or rope for these two vehicles:** range bars (standard 2–3×, Factor 55 4–6× with the 2–4× heavy band hatched) with the user's MBS; peak force by speed for the three kinds at the same MBS and length; table with "keep under".
 7. **Shackles:** side-load slider with a shackle picture, recovery point rating field, Crosby G-209 and Factor 55 soft shackle cards (click to choose; green if WLL > peak).
-8. **Safety straps: three different jobs** (owner asked to keep these distinct, 2026-10-12): damper (stand-off top view to scale, energy), tree protector (pull on the anchor, WARN Epic size, angle between the ends; leg load), bridle (Factor 55 bridle, angle between legs; each point's load from the snatch peak). Over 120° shows Crosby's limit.
+8. **Safety straps: three different jobs** (owner asked to keep these distinct, 2026-10-12): safety lanyard (stand-off top view to scale, energy), tree protector (pull on the anchor, WARN Epic size, angle between the ends; leg load), bridle (Factor 55 bridle, angle between legs; each point's load from the snatch peak). Over 120° shows Crosby's limit.
 Then disclaimer and explainers (speed, MBS vs WLL, gaps).
 
 ## Structure

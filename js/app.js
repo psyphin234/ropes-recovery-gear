@@ -206,7 +206,7 @@
       v.className = "verdict verdict--info";
       v.replaceChildren(el("div", { class: "verdict-top" }, U.statusIcon("incomplete"), el("p", { class: "verdict-head" },
         { stuck: "Type the stuck vehicle's mass on it.", rec: "Type the recovery vehicle's mass on it.", mbs: `Type the ${gear.short.toLowerCase()}'s breaking strength (MBS) on it.`, length: `Type the ${gear.short.toLowerCase()}'s length.` }[R.missing])));
-      ["readouts", "sizes", "shackles", "shackle-notes", "stage-sources", "chart-snatch", "gauge-legend", "damper-body", "tree-body", "bridle-body", "damper-pic"].forEach((id) => $(id).replaceChildren());
+      ["readouts", "sizes", "shackles", "shackle-notes", "stage-sources", "chart-snatch", "gauge-legend", "lanyard-body", "tree-body", "bridle-body", "lanyard-pic"].forEach((id) => $(id).replaceChildren());
       renderTree();
       return;
     }
@@ -214,10 +214,10 @@
     renderPlay();
     renderSizes();
     renderShackles();
-    renderDamper();
+    renderLanyard();
     renderTree();
     renderBridle();
-    $("stage-sources").replaceChildren(U.sourcesLine(["training", "strap-mbs", "kinetic-size", "strap-stretch", "kinetic-stretch", "static-stretch", "kinetic-model", "never-exceed", "recovery-point", "shackle-ratings", "shackle-side-load", "soft-shackles", "no-shackle-join", "damper", "stand-clear", "strap-wet", "strap-life", "tree-protector", "bridle", "leg-load", "shackle-included-angle", "wll-mbs"]));
+    $("stage-sources").replaceChildren(U.sourcesLine(["training", "strap-mbs", "kinetic-size", "strap-stretch", "kinetic-stretch", "static-stretch", "kinetic-model", "never-exceed", "recovery-point", "shackle-ratings", "shackle-side-load", "soft-shackles", "no-shackle-join", "safety-lanyard", "stand-clear", "strap-wet", "strap-life", "tree-protector", "bridle", "leg-load", "shackle-included-angle", "wll-mbs"]));
   }
 
   function placeOverlays(pos) {
@@ -327,7 +327,7 @@
       tile("speed", "Recovery vehicle"),
       tile("energy", "Energy in the strap"),
       el("p", { class: "readout-note" }, kin.breaks
-        ? `The ${R.gear.short.toLowerCase()} reaches its breaking strength ${U.n(kin.tPeak, 0.01)} s after it goes tight, with the recovery vehicle still moving: it would snap and let go of ${U.n(kin.breakEnergyJ / 1000, 0.1)} kJ at once. That's what the damper is for.`
+        ? `The ${R.gear.short.toLowerCase()} reaches its breaking strength ${U.n(kin.tPeak, 0.01)} s after it goes tight, with the recovery vehicle still moving: it would snap and let go of ${U.n(kin.breakEnergyJ / 1000, 0.1)} kJ at once. That's what the safety lanyards at both ends are for.`
         : `If the stuck vehicle doesn't budge, the stretch peaks ${U.n(kin.tPeak, 0.01)} s after it goes tight, with the recovery vehicle stopped, then pulls it back. In a real snatch the stuck vehicle starts to move and the peak is lower.`));
     if (!play.raf) frame(play.t === null ? peakPhase() : play.t);
   }
@@ -401,7 +401,7 @@
     };
     play.raf = requestAnimationFrame(step);
   }
-  // the strap lets go: both halves fly back, the damper drops
+  // the strap lets go: both halves fly back, held by the safety lanyards
   function snapAnim(start) {
     const step = (now) => {
       play.snapF = Math.min(1, (now - start) / 700);
@@ -498,21 +498,22 @@
   }
 
   // ------------------------------------------------------------ the three safety straps
-  function renderDamper() {
+  function renderLanyard() {
     const { kin, len } = R;
     const stretched = kin.peakStretchM;
     const keepM = C.standOff(len, stretched);
-    $("damper-pic").replaceChildren(V.standOff({ width: Math.min(420, $("damper-pic").clientWidth || 360), lengthM: len + stretched, keepM }));
-    $("damper-body").replaceChildren(
+    $("lanyard-pic").replaceChildren(V.standOff({ width: Math.min(420, $("lanyard-pic").clientWidth || 360), lengthM: len + stretched, keepM }));
+    $("lanyard-body").replaceChildren(
       el("div", { class: "job-figs" },
         U.figure("Stand at least", `${U.n(keepM, 0.1)} m away`, `1.5 × the ${U.n(len + stretched, 0.1)} m stretched ${R.gear.short.toLowerCase()} (Bushranger)`),
         U.figure(kin.breaks ? "Let go if it snaps" : "Stored at the peak", `${U.n((kin.breaks ? kin.breakEnergyJ : kin.energyJ) / 1000, 0.1)} kJ`, kin.breaks ? "all at once, at the breaking strength" : `the recovery vehicle's energy at ${R.speed} km/h`)),
       el("ul", { class: "rules-list" },
-        el("li", null, el("strong", null, "Always: "), "the strap standard requires a damper, heavy bag or blanket draped over the strap while it's used, to cut down its rebound."),
-        el("li", null, el("strong", null, "In the middle: "), "WARN puts it midway along the rope, before it takes the load."),
+        el("li", null, el("strong", null, "Its job: "), "to tie the strap or rope back to the vehicle, so a broken shackle, recovery point or strap is held instead of thrown (SECURETECH)."),
+        el("li", null, el("strong", null, "Both ends: "), "one at each end of the recovery, so neither half can fly back."),
+        el("li", null, el("strong", null, "Fitted as its maker says: "), "no maker we found publishes where to tie it, how much slack to leave or what rating it needs. Follow your lanyard's own instructions."),
         el("li", null, el("strong", null, "Everyone out: "), "get out of both vehicles and stand well away, never in line with the strap or in the recovery vehicle's path.")),
-      el("p", { class: "hint" }, "No one we found publishes how much energy a damper soaks up, or how far a broken strap flies. A damper slows the strap down; it doesn't make standing close safe."),
-      U.sourcesLine(["damper", "stand-clear"]));
+      el("p", { class: "hint" }, "A lanyard holds the parts; it doesn't make standing close safe. Nobody we found publishes how far a broken strap or shackle flies."),
+      U.sourcesLine(["safety-lanyard", "stand-clear"]));
   }
 
   function renderTree() {

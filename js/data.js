@@ -60,6 +60,11 @@
       url: "https://www.thecrosbygroup.com/wp-content/uploads/catalog/2022/en-US/364.pdf",
       kind: "maker",
     },
+    securetech: {
+      label: "SECURETECH (South Africa), Recovery Safety Lanyard",
+      url: "https://securetech.co.za/safety/recovery-safety-lanyard",
+      kind: "maker",
+    },
     warnRigging: {
       label: "WARN Industries, Basic Guide to Winch Rigging",
       url: "https://www.warn.com/basic-guide-to-winch-rigging",
@@ -247,15 +252,15 @@
       params: {},
       checked: "2026-10-12",
     },
-    // ---------------------------------------------------------------- recoil
+    // ---------------------------------------------------------------- recoil: lanyards and standing clear
     {
-      id: "damper",
-      category: "standard",
-      title: "A damper over the strap",
-      summary: "The standard requires every strap's instructions to say that a recovery damper, heavy bag or blanket must be draped over the strap while it's used, to reduce unintended rebound. For winching, WARN says to put the damper on the rope midway between the winch and the anchor, before the rope takes the load.",
-      quote: "state that an object such as a recovery damper, heavy bag or blanket must be draped over the strap during use to reduce any unintentional rebound of the strap",
-      sources: ["strapStandard", "bushranger", "warnRigging"],
-      params: { at: 0.5 },
+      id: "safety-lanyard",
+      category: "maker",
+      title: "Safety lanyards at both ends",
+      summary: "A safety lanyard ties the strap or kinetic rope back to the vehicle, so that if something fails (a shackle, a recovery point, the strap itself) the parts are held instead of flying. SECURETECH, which makes one in South Africa, says to fit one at each end of the recovery. Its page gives no fitting instructions or rating, and we found no other maker that publishes them: fit yours as its own instructions say.",
+      quote: "The recovery safety lanyard is attached to the kinetic energy recovery rope or snatch strap, to prevent any parts (e.g. shackle, recovery point, snatch rope or strap) from flying off in the event of a failure during recovery. … Using a Recovery Safety Lanyard (on both ends of the recovery) will prevent the snatch strap or rope from flying back.",
+      sources: ["securetech"],
+      params: { ends: 2 },
       checked: "2026-10-12",
     },
     {
@@ -366,7 +371,7 @@
   const gaps = [
     { id: "speed", title: "How fast to go", text: "No standard or maker found gives a speed for a kinetic recovery. Bushranger says a steady speed in the lowest effective gear. The page shows how the force grows with speed instead." },
     { id: "wet", title: "How much weaker a wet strap is", text: "The standard says a soaked strap is weaker and stretches less, but nobody publishes how much." },
-    { id: "damper", title: "What a damper absorbs", text: "No published figure for how much energy a damper, bag or blanket soaks up, or how far a broken strap or flying shackle travels. The page shows the energy stored in the strap, and the stand-off distance Bushranger gives." },
+    { id: "lanyard", title: "How to fit a safety lanyard", text: "No maker we found publishes where to tie a safety lanyard to the vehicle, how much slack to leave, or what it should be rated for, and nobody publishes how far a broken strap or flying shackle travels. Fit yours as its own instructions say. The page shows the energy in the strap and the stand-off distance Bushranger gives." },
     { id: "curve", title: "Each strap's stretch curve", text: "Makers give one stretch figure, not how stretch grows with load. The page assumes a straight line from no load to break." },
     { id: "recovery-points", title: "Your recovery points", text: "Recovery point ratings differ by vehicle and maker, and some are labelled with a WLL, some with a breaking strength. Type yours in if you know it; the page can't look it up." },
     { id: "tree-wll", title: "A working load for tree protectors", text: "WARN lists a breaking strength for its tree trunk protectors, not a WLL or design factor. The page shows how many times stronger than the load the strap is, and leaves the judgement to you." },

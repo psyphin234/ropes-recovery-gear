@@ -1,6 +1,6 @@
 /*
  * diagrams.js: the page's pictures, built from calc.js results.
- *   scene       side view of the snatch: the stuck vehicle, the strap with its damper, the
+ *   scene       side view of the snatch: the stuck vehicle, the strap with a safety lanyard at each end, the
  *               recovery vehicle. Built once, updated in place (the strap stretches, snaps).
  *   gauge       dial of the force in the strap, with marks for what it must stay under
  *   lineChart   a chart with a playhead and tooltip (force over time, peak force by speed)
@@ -116,16 +116,19 @@
 
     const strap = svg("path", { class: "sc-strap", d: "" });
     const strapB = svg("path", { class: "sc-strap", d: "" });
-    const damper = svg("path", { class: "sc-damper", d: "M -15 -3 Q -16 12 -12 17 L 12 17 Q 16 12 15 -3 Q 0 -9 -15 -3 Z" });
-    const damperG = svg("g", { class: "sc-damperg" }, damper);
+    // safety lanyards: from each vehicle's bar to the strap a little way out from the shackle
+    const lanA = svg("path", { class: "sc-lanyard", d: "" });
+    const lanB = svg("path", { class: "sc-lanyard", d: "" });
+    const qpt = (p0, c, p1, t) => ({ x: (1 - t) * (1 - t) * p0.x + 2 * (1 - t) * t * c.x + t * t * p1.x, y: (1 - t) * (1 - t) * p0.y + 2 * (1 - t) * t * c.y + t * t * p1.y });
+    const lanyard = (anchor, on) => `M ${anchor.x} ${anchor.y} Q ${(anchor.x + on.x) / 2} ${Math.max(anchor.y, on.y) + 12} ${on.x} ${on.y}`;
     const shA = svg("circle", { class: "sc-shackle", cx: A.x, cy: A.y, r: 5 });
     const shB = svg("circle", { class: "sc-shackle", r: 5 });
     const speedTag = svg("text", { class: "sc-tag", x: 0, y: 0, "text-anchor": "middle" }, "");
     const gearTag = svg("text", { class: "sc-gear", x: (A.x + B0.x) / 2, y: GY + 34, "text-anchor": "middle" }, "");
     const snap = svg("text", { class: "sc-snap", x: (A.x + B0.x) / 2, y: A.y - 34, "text-anchor": "middle" }, "");
 
-    const node = svg("svg", { class: "scene-svg", viewBox: `0 0 ${VW} ${VH}`, role: "img", "aria-label": "Side view of the snatch: the stuck vehicle, the strap with a damper over it, and the recovery vehicle" },
-      defs, backdrop, stuck, ground, rec, strap, strapB, damperG, shA, shB, speedTag, gearTag, snap);
+    const node = svg("svg", { class: "scene-svg", viewBox: `0 0 ${VW} ${VH}`, role: "img", "aria-label": "Side view of the snatch: the stuck vehicle, the strap with a safety lanyard at each end, and the recovery vehicle" },
+      defs, backdrop, stuck, ground, rec, strap, strapB, lanA, lanB, shA, shB, speedTag, gearTag, snap);
 
     const pct = (x, y) => ({ left: (x / VW) * 100, top: (y / VH) * 100 });
 
@@ -145,18 +148,24 @@
       speedTag.setAttribute("y", GY + 34);
       speedTag.textContent = s.speedText || "";
       gearTag.textContent = s.gearText || "";
-      let mid;
+      // where each lanyard holds the strap: a set distance out from each end
+      const f0 = Math.min(0.3, 30 / STRAP_PX);
+      let onA;
+      let onB;
       if (s.broken !== null && s.broken !== undefined) {
-        // snapped in the middle: each half flies back toward its own vehicle
+        // snapped in the middle: each half flies back toward its own vehicle, held by its lanyard
         const f = Math.min(1, s.broken);
         const m = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
         const reach = 1 - 0.85 * f;
         const lift = Math.sin(f * Math.PI) * 34;
         const endA = { x: A.x + (m.x - A.x) * reach, y: A.y - lift };
         const endB = { x: B.x - (B.x - m.x) * reach, y: B.y - lift };
-        strap.setAttribute("d", `M ${A.x} ${A.y} Q ${(A.x + endA.x) / 2} ${A.y - lift * 1.4} ${endA.x} ${endA.y}`);
-        strapB.setAttribute("d", `M ${B.x} ${B.y} Q ${(B.x + endB.x) / 2} ${B.y - lift * 1.4} ${endB.x} ${endB.y}`);
-        mid = { x: m.x, y: m.y + f * (GY - 8 - m.y) };
+        const cA = { x: (A.x + endA.x) / 2, y: A.y - lift * 1.4 };
+        const cB = { x: (B.x + endB.x) / 2, y: B.y - lift * 1.4 };
+        strap.setAttribute("d", `M ${A.x} ${A.y} Q ${cA.x} ${cA.y} ${endA.x} ${endA.y}`);
+        strapB.setAttribute("d", `M ${B.x} ${B.y} Q ${cB.x} ${cB.y} ${endB.x} ${endB.y}`);
+        onA = qpt(A, cA, endA, Math.min(0.9, f0 * 2));
+        onB = qpt(B, cB, endB, Math.min(0.9, f0 * 2));
         snap.textContent = "SNAP";
       } else {
         strapB.setAttribute("d", "");
@@ -164,16 +173,18 @@
         if (dx < 0) {
           // slack: the strap sags between the two ends
           const sag = Math.min(46, Math.sqrt(-dx * STRAP_PX) * 0.9);
-          const cx = (A.x + B.x) / 2;
-          const cy = Math.min(GY - 4, (A.y + B.y) / 2 + sag * 2);
-          strap.setAttribute("d", `M ${A.x} ${A.y} Q ${cx} ${cy} ${B.x} ${B.y}`);
-          mid = { x: cx, y: (A.y + B.y) / 4 + cy / 2 };
+          const c = { x: (A.x + B.x) / 2, y: Math.min(GY - 4, (A.y + B.y) / 2 + sag * 2) };
+          strap.setAttribute("d", `M ${A.x} ${A.y} Q ${c.x} ${c.y} ${B.x} ${B.y}`);
+          onA = qpt(A, c, B, f0);
+          onB = qpt(A, c, B, 1 - f0);
         } else {
           strap.setAttribute("d", `M ${A.x} ${A.y} L ${B.x} ${B.y}`);
-          mid = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+          onA = { x: A.x + (B.x - A.x) * f0, y: A.y + (B.y - A.y) * f0 };
+          onB = { x: B.x - (B.x - A.x) * f0, y: B.y - (B.y - A.y) * f0 };
         }
       }
-      damperG.setAttribute("transform", `translate(${mid.x} ${mid.y})`);
+      lanA.setAttribute("d", lanyard({ x: A.x - 10, y: A.y - 12 }, onA));
+      lanB.setAttribute("d", lanyard({ x: B.x + 10, y: B.y - 12 }, onB));
       return {
         stuckField: pct(300 * K + stuckTx + 28, 96),
         recField: pct(310 * K + recTx + 30, 96),
@@ -369,7 +380,8 @@
       zone,
       veh(x0), veh(ex),
       svg("line", { x1: sx, y1: yMid, x2: ex, y2: yMid, class: "so-strap" }),
-      svg("rect", { x: (sx + ex) / 2 - Math.max(5, 1 * sc) / 2, y: yMid - 5, width: Math.max(5, 1 * sc), height: 10, rx: 2, class: "so-damper" }),
+      svg("path", { d: `M ${sx} ${yMid - 3} q ${Math.max(6, 1.2 * sc)} -9 ${Math.max(10, 2 * sc)} -3`, class: "so-lanyard" }),
+      svg("path", { d: `M ${ex} ${yMid - 3} q ${-Math.max(6, 1.2 * sc)} -9 ${-Math.max(10, 2 * sc)} -3`, class: "so-lanyard" }),
       svg("line", { x1: x0, y1: dimY, x2: x0, y2: yMid - vh / 2, class: "so-dim" }),
       svg("text", { x: x0 + 6, y: (dimY + yMid - vh / 2) / 2 + 4, class: "so-text" }, `${U.n(o.keepM, 0.1)} m`),
       svg("text", { x: W / 2, y: H + 12, "text-anchor": "middle", class: "so-text so-text--muted" }, "Everyone outside the dashed line"));
