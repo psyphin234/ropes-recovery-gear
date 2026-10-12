@@ -116,20 +116,19 @@
 
   /*
    * Every shackle on the page with its working figures at a side-load angle.
-   * Steel: Crosby WLL × side-load factor; breaking at 6 × the in-line WLL.
+   * Steel: SECURETECH rated bow shackle WLL × Crosby's side-load factor.
    * Soft: Factor 55's WLL and breaking strength; no side-load figure (a gap).
    */
   function shackles(sideDeg) {
     const keep = sideLoadKeep(sideDeg);
-    const sr = D.rule("shackle-ratings").params;
     const steel = D.steelShackles.map((s) => ({
       id: s.id,
       kind: "steel",
-      name: `${s.size} bow shackle`,
+      name: `${s.size} rated bow shackle`,
       size: s.size,
       ratedWllKg: s.wllT * 1000,
       wllKg: keep === null ? 0 : s.wllT * 1000 * keep,
-      breakKg: s.wllT * 1000 * sr.designFactor,
+      breakKg: null, // SECURETECH lists the WLL only
       keep,
     }));
     const soft = D.softShackles.map((s) => ({

@@ -139,7 +139,7 @@
     });
     $("treeDeg").addEventListener("input", (e) => set({ treeDeg: +e.target.value }));
     D.bridles.forEach((p) => {
-      const b = el("button", { type: "button", role: "radio", class: "chip", "data-bridle": p.id, "aria-checked": "false" }, `Factor 55 ${p.label}`);
+      const b = el("button", { type: "button", role: "radio", class: "chip", "data-bridle": p.id, "aria-checked": "false" }, `SECURETECH ${p.label}`);
       b.addEventListener("click", () => set({ bridle: p.id }));
       $("bridle-chips").appendChild(b);
     });
@@ -217,7 +217,7 @@
     renderLanyard();
     renderTree();
     renderBridle();
-    $("stage-sources").replaceChildren(U.sourcesLine(["training", "strap-mbs", "kinetic-size", "strap-stretch", "kinetic-stretch", "static-stretch", "kinetic-model", "never-exceed", "recovery-point", "shackle-ratings", "shackle-side-load", "soft-shackles", "no-shackle-join", "safety-lanyard", "stand-clear", "strap-wet", "strap-life", "tree-protector", "bridle", "leg-load", "shackle-included-angle", "wll-mbs"]));
+    $("stage-sources").replaceChildren(U.sourcesLine(["securetech-basics", "training", "strap-mbs", "kinetic-size", "strap-stretch", "kinetic-stretch", "static-stretch", "kinetic-model", "never-exceed", "recovery-point", "shackle-ratings", "shackle-side-load", "soft-shackles", "no-shackle-join", "safety-lanyard", "stand-clear", "strap-wet", "strap-life", "tree-protector", "bridle", "leg-load", "shackle-included-angle", "wll-mbs"]));
   }
 
   function placeOverlays(pos) {
@@ -466,7 +466,7 @@
       el("div", { class: "table-wrap" }, el("table", { class: "limit-table speed-table" },
         el("thead", null, el("tr", null, el("th", { scope: "col" }, "Kind"), el("th", { scope: "col", class: "num" }, "Stretch"), el("th", { scope: "col", class: "num" }, `Peak, ${speed} km/h`), el("th", { scope: "col", class: "num" }, "Keep under"))),
         el("tbody", null, rows))),
-      el("p", { class: "hint" }, `Stretch is what makes a kinetic recovery gentle: the more a strap or rope stretches, the longer it takes to stop the recovery vehicle, and the lower the peak. A winch rope (Dyneema, about 3% stretch at break) peaks ${U.n(Math.sqrt(C.stretchOf("strap") / C.stretchOf("static")), 0.1)} times as hard as a snatch strap of the same strength. "Keep under" is the speed at which the peak reaches the weakest of the strap, the shackle${R.pointKg ? " and the recovery points" : ""}. Stretch figures: Bushranger's 20% for its strap, Factor 55's 30% for its rope, Samson's AmSteel-Blue for the winch rope; yours may differ.`),
+      el("p", { class: "hint" }, `Stretch is what makes a kinetic recovery gentle: the more a strap or rope stretches, the longer it takes to stop the recovery vehicle, and the lower the peak. A winch rope (Dyneema, about 3% stretch at break) peaks ${U.n(Math.sqrt(C.stretchOf("strap") / C.stretchOf("static")), 0.1)} times as hard as a snatch strap of the same strength. "Keep under" is the speed at which the peak reaches the weakest of the strap, the shackle${R.pointKg ? " and the recovery points" : ""}. Stretch figures: SECURETECH's 20–30% for straps and 30–40% for ropes, taken at the low end (the higher force), and Samson's AmSteel-Blue for the winch rope; yours may differ. SECURETECH: kinetic straps and ropes must never anchor a winch or extend a winch cable.`),
       U.sourcesLine(["strap-mbs", "kinetic-size", "strap-stretch", "kinetic-stretch", "static-stretch", "kinetic-model"]));
   }
 
@@ -478,11 +478,11 @@
     $("shackles").replaceChildren(...all.map((s) => {
       const ok = s.wllKg > demand;
       const b = el("button", { type: "button", role: "radio", class: "sk" + (ok ? " sk--pass" : " sk--fail"), "aria-checked": String(s.id === shackle.id) },
-        el("span", { class: "sk-kind" }, s.kind === "soft" ? "Soft · Factor 55" : "Steel · Crosby"),
+        el("span", { class: "sk-kind" }, s.kind === "soft" ? "Soft · Factor 55" : "SECURETECH bow"),
         el("strong", { class: "sk-name" }, s.size),
         el("span", { class: "sk-wll" }, U.statusIcon(ok ? "pass" : "fail"), `WLL ${t1(s.wllKg)}`),
         el("small", { class: "sk-sub" }, s.kind === "steel"
-          ? (keep < 1 ? `${Math.round(keep * 100)}% of ${t1(s.ratedWllKg)} at ${sd}°` : `breaks at ${t1(s.breakKg)} or more`)
+          ? (keep < 1 ? `${Math.round(keep * 100)}% of ${t1(s.ratedWllKg)} at ${sd}°` : "WLL embossed on the body")
           : (s.sideUnknown ? "no side-load figure" : `breaks at ${t1(s.breakKg)}`)));
       b.addEventListener("click", () => set({ shackle: s.id }));
       return el("li", null, b);
@@ -490,9 +490,10 @@
     $("shackle-notes").replaceChildren(
       el("p", { class: "hint" }, `Green: the WLL is above the ${t1(demand)} peak force at ${R.speed} km/h, so it passes Bushranger's rule (never exceed the shackles' WLL). The one you pick goes into the check above.${sd > 10 ? ` Pulled ${sd}° off in-line, Crosby's chart leaves a screw pin shackle ${Math.round(keep * 100)}% of its WLL; we found no such figure for soft shackles.` : ""}`),
       el("ul", { class: "rules-list" },
+        el("li", null, el("strong", null, "Rated bow shackles only: "), "SECURETECH: never commercial (unrated) D shackles; at least 2 t WLL, and 2 to 6.5 t covers most recoveries. Back the pin off a little after tightening so it opens afterwards."),
         el("li", null, el("strong", null, "Centre the load in the bow. "), "Crosby: one leg on the pin, never more; never side load a round pin shackle."),
         el("li", null, el("strong", null, "Two legs in one bow, at most 120° apart "), "(Crosby): a bridle or a tree protector's two ends. More on that below."),
-        el("li", null, el("strong", null, "Never join two straps with a shackle "), "(Bushranger). If one breaks, the shackle flies."),
+        el("li", null, el("strong", null, "Never join two straps with a shackle. "), "SECURETECH: use a recovery link between the eyes, and only join straps of the same rating and function. If one breaks, a shackle becomes a missile."),
         el("li", null, el("strong", null, "Big enough for the strap: "), "Crosby says a shackle must not pinch a synthetic sling.")),
       U.sourcesLine(["never-exceed", "shackle-ratings", "shackle-side-load", "soft-shackles", "shackle-included-angle", "no-shackle-join", "wll-mbs"]));
   }
@@ -505,14 +506,15 @@
     $("lanyard-pic").replaceChildren(V.standOff({ width: Math.min(420, $("lanyard-pic").clientWidth || 360), lengthM: len + stretched, keepM }));
     $("lanyard-body").replaceChildren(
       el("div", { class: "job-figs" },
-        U.figure("Stand at least", `${U.n(keepM, 0.1)} m away`, `1.5 × the ${U.n(len + stretched, 0.1)} m stretched ${R.gear.short.toLowerCase()} (Bushranger)`),
+        U.figure("Stand at least", `${U.n(keepM, 0.1)} m away`, `2 × the ${U.n(len + stretched, 0.1)} m stretched ${R.gear.short.toLowerCase()} (SECURETECH)`),
         U.figure(kin.breaks ? "Let go if it snaps" : "Stored at the peak", `${U.n((kin.breaks ? kin.breakEnergyJ : kin.energyJ) / 1000, 0.1)} kJ`, kin.breaks ? "all at once, at the breaking strength" : `the recovery vehicle's energy at ${R.speed} km/h`)),
       el("ul", { class: "rules-list" },
         el("li", null, el("strong", null, "Its job: "), "to tie the strap or rope back to the vehicle, so a broken shackle, recovery point or strap is held instead of thrown (SECURETECH)."),
         el("li", null, el("strong", null, "Both ends: "), "one at each end of the recovery, so neither half can fly back."),
-        el("li", null, el("strong", null, "Fitted as its maker says: "), "no maker we found publishes where to tie it, how much slack to leave or what rating it needs. Follow your lanyard's own instructions."),
+        el("li", null, el("strong", null, "Fitted correctly: "), "SECURETECH ties its lanyard (low-stretch polyester webbing) to the vehicle and over the strap, rope or cable with two ring hitch knots."),
+        el("li", null, el("strong", null, "With a bridle: "), "SECURETECH says to use two lanyards as well."),
         el("li", null, el("strong", null, "Everyone out: "), "get out of both vehicles and stand well away, never in line with the strap or in the recovery vehicle's path.")),
-      el("p", { class: "hint" }, "A lanyard holds the parts; it doesn't make standing close safe. Nobody we found publishes how far a broken strap or shackle flies."),
+      el("p", { class: "hint" }, "A lanyard holds the parts; it doesn't make standing close safe. SECURETECH publishes no breaking strength for its lanyard online, and nobody we found publishes how far a broken strap or shackle flies."),
       U.sourcesLine(["safety-lanyard", "stand-clear"]));
   }
 
@@ -537,9 +539,10 @@
         U.figure(`Epic ${p.label} breaks at`, t1(breakKg), `${U.n(times, 0.1)} × the load on each end`)),
       over ? el("p", { class: "warn-line tone-fail" }, U.statusIcon("fail"), `Over ${maxDeg}°: Crosby says never. Use a longer protector, or wrap it so the ends meet at a narrower angle.`) : null,
       el("ul", { class: "rules-list" },
-        el("li", null, el("strong", null, "Its job: "), "to tie the winch rope to the tree, so the rope never wraps the trunk. WARN: never wrap the winch rope back onto itself."),
-        el("li", null, el("strong", null, "Low on the trunk: "), "WARN says to hook up as low as possible, on an anchor that will hold, with a strap that won't slip."),
-        el("li", null, el("strong", null, "Rated by breaking strength only: "), "WARN lists no WLL for it. With a double or triple line the anchor takes more than the winch's rating: see the ", U.externalLink("https://winching.psyphin.co.za/", "winching page"), ".")),
+        el("li", null, el("strong", null, "Its job: "), "to protect the bark and give the winch a secure anchor, so the rope never wraps the trunk. Never loop the winch rope back onto itself (SECURETECH, WARN)."),
+        el("li", null, el("strong", null, "Size: "), "SECURETECH says 100 mm wide and 2 to 4 m long."),
+        el("li", null, el("strong", null, "Low on the trunk: "), "close to the base of the tree (SECURETECH), and winch in a straight line so it doesn't chafe and ring-bark the tree."),
+        el("li", null, el("strong", null, "Strength: "), "SECURETECH's isn't published online, so the figures above are WARN's Epic protectors (breaking strength only, no WLL). With a double or triple line the anchor takes more than the winch's rating: see the ", U.externalLink("https://winching.psyphin.co.za/", "winching page"), ".")),
       U.sourcesLine(["tree-protector", "leg-load", "shackle-included-angle"])].filter(Boolean));
   }
 
@@ -552,15 +555,18 @@
     const b = D.bridles.find((x) => x.id === S.bridle) || D.bridles[0];
     const pull = R.demand;
     const legKg = C.legLoad(pull, deg);
-    const wllKg = C.lbToKg(b.wllLb);
-    const ok = legKg < wllKg;
+    const heavier = Math.max(R.stuck, R.recv);
+    const massOk = heavier <= b.maxVehicleKg;
+    const times = b.breakKg / legKg;
     $("bridle-body").replaceChildren(...[
       el("div", { class: "job-figs" },
         U.figure("Each point takes", t1(legKg), `${Math.round((legKg / pull) * 100)}% of the ${t1(pull)} snatch above${R.pointKg ? `; points rated ${t1(R.pointKg)}` : ""}`),
-        U.figure(`Factor 55 ${b.label}`, `WLL ${t1(wllKg)}`, `${ok ? "above" : "below"} each leg's load · breaks at ${t1(C.lbToKg(b.breakLb))}`, ok ? "figure--pass" : "figure--fail")),
+        U.figure(`SECURETECH ${b.label}`, `breaks at ${t1(b.breakKg)}`, `${U.n(times, 0.1)} × each leg's load · for vehicles up to ${U.n(b.maxVehicleKg, 1)} kg`, massOk ? "figure--pass" : "figure--fail")),
+      massOk ? null : el("p", { class: "warn-line tone-fail" }, U.statusIcon("fail"), `SECURETECH rates this bridle for vehicles up to ${U.n(b.maxVehicleKg, 1)} kg; the heavier vehicle here is ${U.kg(heavier)}.`),
       over ? el("p", { class: "warn-line tone-fail" }, U.statusIcon("fail"), `Over ${maxDeg}°: Crosby says never put two legs that far apart in one shackle. Use a longer bridle.`) : null,
       el("ul", { class: "rules-list" },
-        el("li", null, el("strong", null, "Its job: "), "to share the pull between both front recovery points. Bushranger: an equaliser spreads the load and cuts the risk of damage."),
+        el("li", null, el("strong", null, "Its job: "), "to balance the pull across two recovery points and ease the stress on each (SECURETECH)."),
+        el("li", null, el("strong", null, "With lanyards: "), "SECURETECH says the safe way is a bridle with two lanyards as well."),
         el("li", null, el("strong", null, "Keep it narrow: "), "side by side, each point takes half. The wider the legs, the more each one takes: at 120° each takes the whole pull.")),
       U.sourcesLine(["bridle", "leg-load", "shackle-included-angle"])].filter(Boolean));
   }
@@ -574,7 +580,7 @@
       U.sourcesLine(["kinetic-model", "strap-stretch", "kinetic-stretch"]));
     fill("explain-mbs",
       el("p", null, D.rule("wll-mbs").summary),
-      el("p", null, "A strap is picked by vehicle mass (its MBS against the GVM); a shackle by its WLL against the force it will see. A 3/4\" Crosby shackle's 4.75 t WLL next to an 8 t strap's MBS makes the shackle look like the weak link; it breaks at 28.5 t or more."),
+      el("p", null, "A strap is picked by vehicle mass (its MBS against the GVM); a shackle by its WLL against the force it will see. A 4.75 t bow shackle's WLL next to an 8 t strap's MBS makes the shackle look like the weak link; Crosby's 4.75 t bow shackle breaks at 28.5 t or more."),
       U.sourcesLine(["wll-mbs", "shackle-ratings", "strap-mbs"]));
     fill("explain-gaps",
       el("p", null, "Where no standard or maker publishes a figure, this page says so rather than filling the gap with a rule of thumb."),

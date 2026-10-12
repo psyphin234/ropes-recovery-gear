@@ -13,7 +13,7 @@
 
   const GROUPS = [
     { category: "standard", title: "Standards", intro: "Australia's mandatory standard for recovery straps: what every strap and its instructions must say. We found no South African equivalent." },
-    { category: "maker", title: "Manufacturers", intro: "Figures and instructions published by strap, rope, shackle and winch makers. Your own gear's label or manual beats these." },
+    { category: "maker", title: "Manufacturers", intro: "Figures and instructions published by strap, rope, shackle and winch makers. SECURETECH (South Africa) is the main source; other makers fill in what it doesn't publish online. Your own gear's label or manual beats these." },
     { category: "calculation", title: "This site's calculations", intro: "Plain physics (statics and energy) applied by this site. Not from a source as such, so they're listed separately and labelled where they're used." },
   ];
 

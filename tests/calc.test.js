@@ -66,8 +66,18 @@
     });
   });
 
-  test("Factor 55's WLLs are their breaking strengths ÷ 5", () => {
-    D.softShackles.concat(D.bridles).forEach((s) => eq(s.breakLb / 5, s.wllLb, s.id));
+  test("Factor 55's soft shackle WLLs are their breaking strengths ÷ 5", () => {
+    D.softShackles.forEach((s) => eq(s.breakLb / 5, s.wllLb, s.id));
+  });
+
+  test("SECURETECH bridles: breaking strength is 4 × the vehicle mass they're rated for", () => {
+    D.bridles.forEach((b) => eq(b.breakKg, 4 * b.maxVehicleKg, b.id));
+  });
+
+  test("SECURETECH rated bow shackles: 2 to 8.5 t, none under the 2 000 kg minimum", () => {
+    const min = D.rule("shackle-ratings").params.minWllKg;
+    eq(D.steelShackles.map((s) => s.wllT).join(","), "2,3.25,4.75,6.5,8.5", "sizes");
+    D.steelShackles.forEach((s) => { if (s.wllT * 1000 < min) throw new Error(s.id); });
   });
 
   test("scenarios use known gear and shackles", () => {
@@ -153,11 +163,11 @@
     eq(C.sideLoadKeep(95), null, "past the chart");
   });
 
-  test("shackles: steel WLL drops with side load, breaks at 6 × rated WLL; soft unchanged", () => {
+  test("shackles: steel WLL drops with side load; soft unchanged", () => {
     const s = C.shackles(45);
-    const g = s.find((x) => x.id === "g209-3/4");
-    near(g.wllKg, 4750 * 0.7, 1e-9, "3/4\" at 45°");
-    near(g.breakKg, 4750 * 6, 1e-9, "3/4\" breaks");
+    const g = s.find((x) => x.id === "bow-4.75");
+    near(g.wllKg, 4750 * 0.7, 1e-9, "4.75 t at 45°");
+    eq(g.breakKg, null, "no published breaking strength");
     const f = s.find((x) => x.id === "f55-3/8");
     near(f.wllKg, C.lbToKg(8700), 1e-9, "soft WLL");
     eq(f.sideUnknown, true, "flagged: no side-load figure");
@@ -169,8 +179,8 @@
     near(C.legLoad(1000, 120), 1000, 1e-9, "120°");
   });
 
-  test("stand-off: 1.5 × the stretched length", () => {
-    near(C.standOff(9, 0.6), 14.4, 1e-9, "9 m strap stretched 0.6 m");
+  test("stand-off: SECURETECH's 2 × the (stretched) length", () => {
+    near(C.standOff(9, 0.6), 19.2, 1e-9, "9 m strap stretched 0.6 m");
   });
 
   // ------------------------------------------------------------ report

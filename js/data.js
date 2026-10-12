@@ -8,6 +8,10 @@
  *   maker       - a strap, rope, shackle or winch maker's published figure or instruction
  *   calculation - this site's own physics; says so wherever it is shown
  *
+ * SECURETECH (South Africa) is the lead source (owner's call, 2026-10-12: the
+ * owner has seen their manufacturing and testing and uses their gear). Other
+ * makers and the Australian standard fill in what SECURETECH doesn't publish.
+ *
  * Source policy: engineering, standards, manufacturers' data and published
  * methods only. No forum, club or "everyone says" figures. Where nothing
  * citable exists, add an entry to `gaps` and say so on the page.
@@ -60,9 +64,39 @@
       url: "https://www.thecrosbygroup.com/wp-content/uploads/catalog/2022/en-US/364.pdf",
       kind: "maker",
     },
-    securetech: {
-      label: "SECURETECH (South Africa), Recovery Safety Lanyard",
-      url: "https://securetech.co.za/safety/recovery-safety-lanyard",
+    stGuide: {
+      label: "SECURETECH (South Africa), Safety & Downloads: recovery and safety guidelines",
+      url: "https://securetech.co.za/safety-downloads/",
+      kind: "maker",
+    },
+    stKineticStrap: {
+      label: "SECURETECH, Kinetic Strap",
+      url: "https://securetech.co.za/product/kinetic-strap/",
+      kind: "maker",
+    },
+    stKineticRope: {
+      label: "SECURETECH, Kinetic rope",
+      url: "https://securetech.co.za/product/kinetic-rope/",
+      kind: "maker",
+    },
+    stShackle: {
+      label: "SECURETECH, Rated Alloy Recovery Bow Shackle",
+      url: "https://securetech.co.za/product/rated-alloy-recovery-bow-shackle-copy/",
+      kind: "maker",
+    },
+    stLanyard: {
+      label: "SECURETECH, Recovery Safety Lanyard",
+      url: "https://securetech.co.za/product/recovery-safety-lanyard/",
+      kind: "maker",
+    },
+    stBridle: {
+      label: "SECURETECH, Recovery Bridle",
+      url: "https://securetech.co.za/product/recovery-bridle/",
+      kind: "maker",
+    },
+    stTree: {
+      label: "SECURETECH, Tree Trunk Protector",
+      url: "https://securetech.co.za/product/tree-trunk-protector/",
       kind: "maker",
     },
     warnRigging: {
@@ -71,7 +105,7 @@
       kind: "maker",
     },
     warnEpic: {
-      label: "WARN Industries, Epic Tree Trunk Protector listings (1 in, 2 in and 4 in × 8 ft)",
+      label: "WARN Industries, Epic Tree Trunk Protector listings (25, 51 and 102 mm wide, 2.4 m long)",
       url: "https://www.warn.com/products/epic-tree-trunk-protector-1-x-8-92094",
       moreUrls: ["https://www.warn.com/products/epic-rigging-strap-2-x-8-92095", "https://www.warn.com/products/epic-rigging-strap-4-x-8-92096"],
       kind: "maker",
@@ -86,8 +120,8 @@
   /*
    * The three things that can be on the end of the vehicles. `stretch` is the
    * stretch at the strap's breaking strength used by the spring model.
-   *   strap:   Bushranger's "Stretch Factor: 20%" (the sheet doesn't say at what load)
-   *   kinetic: Factor 55's "can stretch up to 30 percent"
+   *   strap:   SECURETECH 20-30%, taken at 20% (the low end gives the higher force)
+   *   kinetic: SECURETECH 30-40%, taken at 30% (likewise)
    *   static:  Samson AmSteel-Blue, 0.96% at 30% of break, carried on in a straight line
    */
   const gearTypes = [
@@ -96,22 +130,23 @@
     { id: "static", label: "Winch rope (static)", short: "Winch rope", stretchRule: "static-stretch", sizeRule: null, series: "s4" },
   ];
 
-  // Crosby G-209 screw pin anchor shackles: nominal size, pin, WLL (t).
-  // Minimum ultimate strength is 6 x WLL (Crosby's 6:1 design factor).
+  // SECURETECH rated alloy recovery bow shackles (US Fed Spec RR-C-271b): the
+  // WLLs it lists (t). Crosby's G-209 bow shackles come in the same WLLs.
   const steelShackles = [
-    { id: "g209-1/2", size: '1/2"', pinMm: 13, wllT: 2 },
-    { id: "g209-5/8", size: '5/8"', pinMm: 16, wllT: 3.25 },
-    { id: "g209-3/4", size: '3/4"', pinMm: 19, wllT: 4.75 },
-    { id: "g209-7/8", size: '7/8"', pinMm: 22, wllT: 6.5 },
-    { id: "g209-1", size: '1"', pinMm: 25, wllT: 8.5 },
+    { id: "bow-2", size: "2 t", wllT: 2 },
+    { id: "bow-3.25", size: "3.25 t", wllT: 3.25 },
+    { id: "bow-4.75", size: "4.75 t", wllT: 4.75 },
+    { id: "bow-6.5", size: "6.5 t", wllT: 6.5 },
+    { id: "bow-8.5", size: "8.5 t", wllT: 8.5 },
   ];
 
-  // Factor 55 Extreme Duty soft shackles, as listed (lb). Factor 55 calls the
-  // strength "Maximum breaking strength"; its WLL is that ÷ 5 for every item.
+  // Factor 55 Extreme Duty soft shackles, as listed in lb (shown in kg). Factor 55
+  // calls the strength "Maximum breaking strength"; its WLL is that ÷ 5 for every item.
+  // SECURETECH's own soft shackle page lists no strength of its own.
   const softShackles = [
-    { id: "f55-3/8", size: '3/8" × 10"', breakLb: 43500, wllLb: 8700 },
-    { id: "f55-5/8", size: '5/8" × 18"', breakLb: 102500, wllLb: 20500 },
-    { id: "f55-7/8", size: '7/8" × 24"', breakLb: 185000, wllLb: 37000 },
+    { id: "f55-3/8", size: "9.5 × 254 mm", breakLb: 43500, wllLb: 8700 },
+    { id: "f55-5/8", size: "16 × 457 mm", breakLb: 102500, wllLb: 20500 },
+    { id: "f55-7/8", size: "22 × 610 mm", breakLb: 185000, wllLb: 37000 },
   ];
 
   // Crosby's side loading reduction chart (screw pin and bolt type shackles only):
@@ -127,16 +162,18 @@
   ];
 
   // WARN Epic tree trunk protectors: breaking strength as listed (lb). No WLL listed.
+  // (SECURETECH publishes its protector's size and make-up online, not its strength.)
   const treeProtectors = [
-    { id: "epic-1", label: '1" × 8 ft', breakLb: 7200 },
-    { id: "epic-2", label: '2" × 8 ft', breakLb: 14400 },
-    { id: "epic-4", label: '4" × 8 ft', breakLb: 30000 },
+    { id: "epic-1", label: "25 mm × 2.4 m", breakLb: 7200 },
+    { id: "epic-2", label: "51 mm × 2.4 m", breakLb: 14400 },
+    { id: "epic-4", label: "102 mm × 2.4 m", breakLb: 30000 },
   ];
 
-  // Factor 55 kinetic rope bridles (lb).
+  // SECURETECH recovery bridles, from its table: maximum vehicle mass, minimum
+  // breaking strength (kg), overall length (m).
   const bridles = [
-    { id: "f55-b-7/8", label: '7/8" × 10 ft', breakLb: 28300, wllLb: 5660 },
-    { id: "f55-b-1", label: '1" × 10 ft', breakLb: 33500, wllLb: 6700 },
+    { id: "st-b-10.5", label: "10.5 t × 3.5 m", breakKg: 10500, maxVehicleKg: 2625, lengthM: 3.5 },
+    { id: "st-b-16", label: "16 t × 5 m", breakKg: 16000, maxVehicleKg: 4000, lengthM: 5 },
   ];
 
   const rules = [
@@ -155,20 +192,20 @@
       id: "strap-stretch",
       category: "maker",
       title: "How far a snatch strap stretches",
-      summary: "Bushranger lists a 20% stretch factor for its 9 m nylon snatch strap. The sheet doesn't say at what load; this page takes it as the stretch at the strap's breaking strength. Your strap's label or sheet beats this figure.",
-      quote: "Material: Nylon Webbing · Length: 9 meters (unstretched) · Stretch Factor: 20%",
-      sources: ["bushranger"],
+      summary: "SECURETECH's kinetic straps (polyamide webbing, made and tested to EN 1492-2 and SANS 94-2) stretch 20–30%, depending on several factors, and SECURETECH warns that the top of the quoted stretch is also where the strap can fail. The page takes 20%, the low end: a strap that stretches less stops the recovery vehicle harder, so this gives the higher force. Bushranger lists 20% for its strap too. Your strap's label beats this figure.",
+      quote: "Elongation is between 20-30% (multiple factors influence this) … It is important that you should understand that the maximum percentage of stretch quoted i.e. 30% is also the point at which a failure could occur!",
+      sources: ["stKineticStrap", "stGuide", "bushranger"],
       params: { stretch: 0.2 },
       checked: "2026-10-12",
     },
     {
       id: "strap-life",
       category: "maker",
-      title: "A snatch strap wears out",
-      summary: "Bushranger: inspect the strap before every snatch (frayed material, loose stitching, cuts, abrasions) and discard it if any show; keep count of recoveries, and replace it after 10. Repeated snatches in a short time build up heat and can make it fail. Don't drive over it, keep it off sharp and hot surfaces and away from petroleum products, acids and alkalis.",
-      quote: "Check the strap usage chart for number of recoveries the strap has carried out. … Snatch strap life = 10 recoveries",
-      sources: ["bushranger"],
-      params: { recoveries: 10 },
+      title: "Rest a strap between snatches",
+      summary: "SECURETECH: after one hard snatch a strap has used its kinetic capability, and needs about eight hours for every 10% of stretch to creep back: 24 hours to recover from 30%. A strap that no longer returns to its labelled length has lost its kinetic capability and can only be used as a pull strap. Inspect gear after use, don't knot straps or ropes, keep them off hot exhausts, and send damaged gear back for inspection. Bushranger also says to count recoveries and replace its strap after 10.",
+      quote: "after one rigorous snatch, the kinetic capability has been utilised and the strap requires eight hours for every 10% of stretch to 'creep back' or be restored to its original length and kinetic capability, thus, to get back to 30% (full) extension requires 24 hours of rest.",
+      sources: ["stGuide", "bushranger"],
+      params: { hoursPer10Pct: 8, recoveries: 10 },
       checked: "2026-10-12",
     },
     {
@@ -186,9 +223,9 @@
       id: "kinetic-stretch",
       category: "maker",
       title: "How far a kinetic rope stretches",
-      summary: "Factor 55's double-braided nylon kinetic ropes stretch up to 30% of their length. The page takes 30% as the stretch at the rope's breaking strength. Other makers' ropes differ: read your rope's label.",
-      quote: "Factor 55 double braided nylon recovery rope can stretch up to 30 percent of its total length.",
-      sources: ["f55"],
+      summary: "SECURETECH's kinetic ropes are loosely plaited, high-elongation polyamide, from 8 to 16 t commercially; its guidelines give 30–40% stretch (its product page says 35–40%). The page takes 30%, the low end, for the higher force. Factor 55 lists up to 30% for its ropes. Read your rope's label.",
+      quote: "the rope is an ultrahigh elongation, high tenacity, plaited polyamide rope and can elongate 30-40%.",
+      sources: ["stGuide", "stKineticRope", "f55"],
       params: { stretch: 0.3 },
       checked: "2026-10-12",
     },
@@ -244,11 +281,21 @@
     },
     {
       id: "recovery-point",
-      category: "standard",
+      category: "maker",
       title: "Only rated recovery points",
-      summary: "The warning the standard requires on every strap: people have been killed by tow balls and other fittings flying off when straps were attached to them. Attach only to an approved, rated recovery point, and everyone gets out and stands well away.",
-      quote: "NEVER attach recovery straps to vehicle fittings such as tow balls, tow bars, tiedown points or tow hooks. ONLY attach recovery straps to an APPROVED recovery point/device that is suitably rated for use with the strap.",
-      sources: ["strapStandard"],
+      summary: "SECURETECH: a standard tow bar or tow ball is unsuitable for recovery; every vehicle in a recovery needs suitable recovery points front and rear, drawing off the chassis. The warning the Australian standard puts on every strap: people have been killed by tow balls and other fittings flying off when straps were attached to them.",
+      quote: "A standard tow bar or tow ball is unsuitable as an attachment point for recovery. Ensure that you have suitable recovery points to the front and rear of all vehicles involved in a recovery.",
+      sources: ["stGuide", "strapStandard"],
+      params: {},
+      checked: "2026-10-12",
+    },
+    {
+      id: "securetech-basics",
+      category: "maker",
+      title: "How SECURETECH says to do it",
+      summary: "SECURETECH's guidelines for every recovery: always recover in a straight line; don't use damaged straps or ropes, and don't knot them; never step over a tensioned cable, rope or strap; dig out or pack the ruts first where you can. For a snatch: lay the strap back over itself in an S (about half its length), take off in first gear low range in a straight line, and stop before the strap stops you. Kinetic straps and ropes are the last line of defence, and must never anchor a winch or extend a winch cable. SECURETECH adds that these are guidelines only: with so many variables it can't guarantee the outcome.",
+      quote: "The recovery vehicle takes off normally in 1st gear, low range in a straight line away from the stuck vehicle and stretches the strap to its fullest. Practice will allow a good driver to stop before the strap stops him … Kinetic straps and ropes should never be used to anchor a winching operation or extend a winch cable.",
+      sources: ["stGuide"],
       params: {},
       checked: "2026-10-12",
     },
@@ -257,32 +304,32 @@
       id: "safety-lanyard",
       category: "maker",
       title: "Safety lanyards at both ends",
-      summary: "A safety lanyard ties the strap or kinetic rope back to the vehicle, so that if something fails (a shackle, a recovery point, the strap itself) the parts are held instead of flying. SECURETECH, which makes one in South Africa, says to fit one at each end of the recovery. Its page gives no fitting instructions or rating, and we found no other maker that publishes them: fit yours as its own instructions say.",
-      quote: "The recovery safety lanyard is attached to the kinetic energy recovery rope or snatch strap, to prevent any parts (e.g. shackle, recovery point, snatch rope or strap) from flying off in the event of a failure during recovery. … Using a Recovery Safety Lanyard (on both ends of the recovery) will prevent the snatch strap or rope from flying back.",
-      sources: ["securetech"],
-      params: { ends: 2 },
+      summary: "A safety lanyard ties the strap or kinetic rope back to the vehicle, so that if something fails (a shackle, a recovery point, the strap itself) the parts are held instead of flying. SECURETECH's lanyard is low-stretch (5%) high-tenacity polyester webbing, tied to the vehicle and over the strap, rope or cable with two ring hitch knots, one at each end of the recovery. SECURETECH shows one fused to a shackle by the force of a failed recovery: it stopped the shackle whipping back.",
+      quote: "it is made of low elongation (5%) high tenacity polyester webbing and is attached to the vehicle and over the strap, rope or cable by two ring hitch knots … Using a Recovery Safety Lanyard (on both ends of the recovery) will prevent the snatch strap or rope from flying back.",
+      sources: ["stGuide", "stLanyard"],
+      params: { ends: 2, stretch: 0.05 },
       checked: "2026-10-12",
     },
     {
       id: "stand-clear",
       category: "maker",
       title: "How far to stand away",
-      summary: "The standard: everyone gets out of the vehicles and stands as far away as possible, never in the path of the recovering vehicle. Bushranger's sheet puts a minimum on it: at least 1.5 times the strap's length. Its wording is \"upstretched\"; the page uses the stretched length, the longer of the two readings. Samson: never stand in line with a rope under tension.",
-      quote: "Stand as far away from the vehicles as possible, (at least 1.5 times the length of the upstretched strap)",
-      sources: ["bushranger", "strapStandard", "samsonWarning"],
-      params: { factor: 1.5 },
+      summary: "SECURETECH: keep everyone well clear of ropes, straps and cables in case they recoil when something fails, as a rule about twice the length of the strap, rope or cable in use. The page takes twice the stretched length, the longer reading. (Bushranger's sheet says at least 1.5 times.) Everyone gets out of the vehicles first, and nobody stands in line with the strap or in the recovery vehicle's path.",
+      quote: "Keep participants and observers well clear of ropes, straps or cables in case of recoil due to a failure (as a rule generally twice the length of the cable, strap or rope utilised).",
+      sources: ["stGuide", "bushranger", "samsonWarning"],
+      params: { factor: 2 },
       checked: "2026-10-12",
     },
     // ---------------------------------------------------------------- shackles
     {
       id: "shackle-ratings",
       category: "maker",
-      title: "Steel shackle ratings",
-      summary: "Crosby G-209 screw pin anchor (bow) shackles: 1/2\" 2 t, 5/8\" 3.25 t, 3/4\" 4.75 t, 7/8\" 6.5 t, 1\" 8.5 t WLL. Minimum ultimate strength is 6 times the WLL; proof load is 2 times. Other brands differ: read the WLL marked on your shackle.",
-      quote: "Minimum Ultimate Strength is 6 times the Working Load Limit.",
-      sources: ["crosby"],
-      params: { shackles: steelShackles, designFactor: 6, proofFactor: 2 },
-      checked: "2026-10-11",
+      title: "Rated bow shackles",
+      summary: "SECURETECH: use only rated alloy recovery bow shackles (US Fed Spec RR-C-271b), never commercial (unrated) D shackles, with a WLL of at least 2 000 kg; a range from 2 to 6.5 t covers most recoveries. Sizes listed: 2, 3.25, 4.75, 6.5 and 8.5 t WLL. A rated shackle has a thicker pin than its body, and the WLL and batch number are embossed on it. Hand-tighten the pin, then back it off a little so it opens after the pull. Crosby's G-209 bow shackles come in the same WLLs and break at no less than 6 times the WLL.",
+      quote: "Use rated alloy recovery bow shackles with a WORK LOAD LIMIT of not less than 2000kg to attach the strap, cable or rope used. ( Fed Spec RR-C-271b) On a rated shackle the pin and body will be of a different diameter (pin is generally thicker). The body will be embossed with the Work Load Limit (WLL) and batch no.",
+      sources: ["stGuide", "stShackle", "crosby"],
+      params: { shackles: steelShackles, minWllKg: 2000, crosbyDesignFactor: 6 },
+      checked: "2026-10-12",
     },
     {
       id: "shackle-side-load",
@@ -308,9 +355,9 @@
       id: "no-shackle-join",
       category: "maker",
       title: "Never join straps with a shackle",
-      summary: "Bushranger: never use a D or bow shackle to join two or more snatch straps. If a strap breaks, the shackle between them becomes the projectile.",
-      quote: "NEVER use a 'D' or Bow shackle to connect two or more snatch straps.",
-      sources: ["bushranger"],
+      summary: "SECURETECH: join only straps and ropes of the same rating and function, with a recovery link between the two eyes so they can't melt onto each other; never with a shackle, which becomes a potentially deadly missile if something fails. Bushranger says the same.",
+      quote: "it is not safe practice to join straps or ropes with a shackle as should a failure occur the shackle will become a potentially deadly missile!",
+      sources: ["stGuide", "bushranger"],
       params: {},
       checked: "2026-10-12",
     },
@@ -318,9 +365,9 @@
       id: "soft-shackles",
       category: "maker",
       title: "Soft shackle ratings",
-      summary: "Factor 55's Extreme Duty soft shackles: 3/8\" × 10\" 43 500 lb maximum breaking strength (8 700 lb WLL), 5/8\" × 18\" 102 500 lb (20 500 lb), 7/8\" × 24\" 185 000 lb (37 000 lb). Each WLL is the breaking strength ÷ 5. Crosby's side loading chart is for steel shackles; we found no published side loading figure for soft shackles.",
-      quote: "3/8\" Extreme Duty Soft Shackle Size: 3/8\" diameter x 10\" length Maximum breaking strength 43,500 lbs. Working load limit 8,700 lbs.",
-      sources: ["f55"],
+      summary: "SECURETECH doesn't list a strength for its soft shackle online, so the page uses Factor 55's Extreme Duty soft shackles: 9.5 mm × 254 mm, 19.7 t maximum breaking strength (3.95 t WLL); 16 mm × 457 mm, 46.5 t (9.3 t); 22 mm × 610 mm, 83.9 t (16.8 t). Each WLL is the breaking strength ÷ 5. SECURETECH: no bow or D shackles in a soft-shackle set-up, and watch for sharp edges on recovery eyes. Crosby's side loading chart is for steel shackles; we found no published side loading figure for soft shackles.",
+      quote: "3/8\" Extreme Duty Soft Shackle Size: 3/8\" diameter x 10\" length Maximum breaking strength 43,500 lbs. Working load limit 8,700 lbs. (Factor 55, in its own units)",
+      sources: ["f55", "stGuide"],
       params: { shackles: softShackles },
       checked: "2026-10-12",
     },
@@ -328,9 +375,9 @@
       id: "wll-mbs",
       category: "maker",
       title: "Breaking strength versus WLL",
-      summary: "Breaking strength (MBS) is where a new item breaks. WLL (working load limit) is the most the maker rates it for in use: the breaking strength divided by a design factor. Crosby's steel shackles use 6; Factor 55 lists its ropes, bridles and soft shackles at 5; Samson recommends at least 5 for rope. Straps carry only their MBS (the standard asks for no more). Never compare one item's MBS with another's WLL.",
-      quote: "Minimum Ultimate Strength is 6 times the Working Load Limit.",
-      sources: ["crosby", "f55", "samsonWarning", "strapStandard"],
+      summary: "Breaking strength (MBS) is where a new item breaks. WLL (working load limit) is the most the maker rates it for in use: the breaking strength divided by a design factor. SECURETECH embosses the WLL on its rated bow shackles and rates its straps and bridles by minimum breaking strength. Crosby's steel shackles use a factor of 6; Factor 55 lists its soft shackles at 5; Samson recommends at least 5 for rope. Never compare one item's MBS with another's WLL.",
+      quote: "The body will be embossed with the Work Load Limit (WLL) and batch no.",
+      sources: ["stGuide", "crosby", "f55", "samsonWarning"],
       params: {},
       checked: "2026-10-12",
     },
@@ -339,19 +386,19 @@
       id: "tree-protector",
       category: "maker",
       title: "Tree trunk protectors",
-      summary: "A tree trunk protector is a rigging strap that ties the winch rope to a tree (or another anchor) so the rope never wraps around the trunk. WARN: secure it around the anchor, hook up as low as possible, never wrap the winch rope back onto itself, and make sure the anchor will take the load and the strap won't slip. WARN's Epic protectors list a breaking strength only: 1\" × 8 ft 7 200 lb, 2\" × 8 ft 14 400 lb, 4\" × 8 ft 30 000 lb.",
-      quote: "Rigging strap is designed to secure a winch rope to a tree or other suitable anchor point. … Natural anchors include trees, stumps, and rocks — hook the cable as low as possible.",
-      sources: ["warnEpic", "warnRigging"],
-      params: { protectors: treeProtectors },
+      summary: "A tree trunk protector protects the bark and gives the winch a secure anchor. SECURETECH: it should be 100 mm wide and 2–4 m long, close to the base of the tree, and you winch in a straight line so it doesn't chafe and ring-bark the tree. SECURETECH's is low-stretch (5%) polyester webbing, made and tested to EN 1492-1 and SANS 94-1; its strength isn't published online. For strengths, the page uses WARN's Epic protectors (breaking strength only): 25 mm × 2.4 m 3.27 t, 51 mm × 2.4 m 6.53 t, 102 mm × 2.4 m 13.6 t. Never wrap the winch rope back onto itself (WARN and SECURETECH).",
+      quote: "Your tree trunk protector should be 100 mm wide, and 2—4 metres long. Winch in a straight line so as not to chafe and ring bark trees. … The tree protector should be positioned close to the base of the tree.",
+      sources: ["stGuide", "stTree", "warnEpic", "warnRigging"],
+      params: { protectors: treeProtectors, widthMm: 100, minLengthM: 2, maxLengthM: 4 },
       checked: "2026-10-12",
     },
     {
       id: "bridle",
       category: "maker",
-      title: "Bridles (equaliser straps)",
-      summary: "A bridle joins two recovery points so they share the pull. Bushranger: equaliser straps on the front recovery points spread the load and cut the risk of damage. Factor 55's kinetic rope bridles: 7/8\" × 10 ft 28 300 lb maximum breaking strength (5 660 lb WLL), 1\" × 10 ft 33 500 lb (6 700 lb WLL).",
-      quote: "Equaliser strap(s) connected to the vehicle(s) front recovery points will distribute the load, reducing the risk of damage to the vehicle(s).",
-      sources: ["bushranger", "f55"],
+      title: "Bridles",
+      summary: "A bridle balances the pull across two recovery points and eases the stress on each. SECURETECH's are low-stretch (5%) polyester webbing, made and tested to EN 1492-2 and SANS 94-2: 10 500 kg minimum breaking strength and 3.5 m long for vehicles up to 2 625 kg, 16 000 kg and 5 m for vehicles up to 4 000 kg (4 times the vehicle mass in both). SECURETECH says the safe way is to use a bridle with two lanyards as well.",
+      quote: "The bridle is used to balance or spread the load across two anchor points when recovering a stuck vehicle … The safe option is to use the bridle in conjunction with two lanyards as well.",
+      sources: ["stGuide", "stBridle"],
       params: { bridles: bridles },
       checked: "2026-10-12",
     },
@@ -369,30 +416,30 @@
 
   // Things nobody citable publishes: shown as "no published figure", never guessed.
   const gaps = [
-    { id: "speed", title: "How fast to go", text: "No standard or maker found gives a speed for a kinetic recovery. Bushranger says a steady speed in the lowest effective gear. The page shows how the force grows with speed instead." },
+    { id: "speed", title: "How fast to go", text: "No standard or maker found gives a speed for a kinetic recovery. SECURETECH says first gear, low range, in a straight line, stopping before the strap stops you; Bushranger says a steady speed in the lowest effective gear. The page shows how the force grows with speed instead." },
     { id: "wet", title: "How much weaker a wet strap is", text: "The standard says a soaked strap is weaker and stretches less, but nobody publishes how much." },
-    { id: "lanyard", title: "How to fit a safety lanyard", text: "No maker we found publishes where to tie a safety lanyard to the vehicle, how much slack to leave, or what it should be rated for, and nobody publishes how far a broken strap or flying shackle travels. Fit yours as its own instructions say. The page shows the energy in the strap and the stand-off distance Bushranger gives." },
+    { id: "lanyard", title: "A rating for safety lanyards", text: "SECURETECH publishes how to tie its lanyard (two ring hitch knots, to the vehicle and over the strap) but not its breaking strength or how much slack to leave, and nobody publishes how far a broken strap or flying shackle travels. The page shows the energy in the strap and SECURETECH's stand-off distance." },
     { id: "curve", title: "Each strap's stretch curve", text: "Makers give one stretch figure, not how stretch grows with load. The page assumes a straight line from no load to break." },
     { id: "recovery-points", title: "Your recovery points", text: "Recovery point ratings differ by vehicle and maker, and some are labelled with a WLL, some with a breaking strength. Type yours in if you know it; the page can't look it up." },
-    { id: "tree-wll", title: "A working load for tree protectors", text: "WARN lists a breaking strength for its tree trunk protectors, not a WLL or design factor. The page shows how many times stronger than the load the strap is, and leaves the judgement to you." },
+    { id: "tree-wll", title: "A working load for tree protectors", text: "SECURETECH doesn't publish its protector's strength online, and WARN lists a breaking strength, not a WLL or design factor. The page shows how many times stronger than the load the strap is, and leaves the judgement to you." },
     { id: "soft-side", title: "Soft shackles loaded from the side", text: "No published side loading figures for soft shackles." },
   ];
 
   // Ready-made examples. Made-up figures that show how the inputs combine;
   // masses are typical loaded 4x4s, not from a source.
   const scenarios = [
-    { id: "sand", label: "Two bakkies in sand", values: { stuckKg: 2900, recKg: 3100, gear: "strap", mbsKg: 8000, lengthM: 9, speedKmh: 10, shackle: "g209-3/4" } },
+    { id: "sand", label: "Two bakkies in sand", values: { stuckKg: 2900, recKg: 3100, gear: "strap", mbsKg: 8000, lengthM: 9, speedKmh: 10, shackle: "bow-4.75" } },
     { id: "light", label: "Light SUV, heavy rescuer", values: { stuckKg: 1900, recKg: 3500, gear: "kinetic", mbsKg: Math.round(28300 * LB), lengthM: 9.1, speedKmh: 8, shackle: "f55-3/8" } },
-    { id: "fast", label: "Too fast: 25 km/h", values: { stuckKg: 2900, recKg: 3100, gear: "strap", mbsKg: 8000, lengthM: 9, speedKmh: 25, shackle: "g209-3/4" } },
-    { id: "static", label: "Winch rope used to snatch", values: { stuckKg: 2900, recKg: 3100, gear: "static", mbsKg: 8000, lengthM: 9, speedKmh: 8, shackle: "g209-3/4" } },
+    { id: "fast", label: "Too fast: 25 km/h", values: { stuckKg: 2900, recKg: 3100, gear: "strap", mbsKg: 8000, lengthM: 9, speedKmh: 25, shackle: "bow-4.75" } },
+    { id: "static", label: "Winch rope used to snatch", values: { stuckKg: 2900, recKg: 3100, gear: "static", mbsKg: 8000, lengthM: 9, speedKmh: 8, shackle: "bow-4.75" } },
     { id: "overland", label: "Heavy overlander", values: { stuckKg: 4400, recKg: 3300, gear: "kinetic", mbsKg: Math.round(33500 * LB), lengthM: 9.1, speedKmh: 6, shackle: "f55-5/8" } },
   ];
 
   // The defaults the page opens with (also an example, labelled as such).
   const defaults = {
     stuckKg: 2900, recKg: 3100, gear: "strap", mbsKg: 8000, lengthM: 9, speedKmh: 10,
-    shackle: "g209-3/4", sideDeg: 0, pointKg: null,
-    bridleDeg: 60, bridle: "f55-b-7/8",
+    shackle: "bow-4.75", sideDeg: 0, pointKg: null,
+    bridleDeg: 60, bridle: "st-b-16",
     treePullKg: 4310, treeDeg: 30, protector: "epic-4",
   };
 
