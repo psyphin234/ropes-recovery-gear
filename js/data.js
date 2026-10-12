@@ -228,6 +228,16 @@
       checked: "2026-10-12",
     },
     {
+      id: "training",
+      category: "standard",
+      title: "Get trained",
+      summary: "The standard requires every strap's instructions to tell users to consider a nationally recognised four-wheel drive training course, or to contact a four-wheel drive club, for advice on choosing and using the strap. This page is no substitute for that.",
+      quote: "state that persons intending to use the strap should consider completing a nationally recognised fourwheel drive training course, or contact a fourwheel drive club for comprehensive advice on the proper selection and use of the strap",
+      sources: ["strapStandard", "bushranger"],
+      params: {},
+      checked: "2026-10-12",
+    },
+    {
       id: "recovery-point",
       category: "standard",
       title: "Only rated recovery points",

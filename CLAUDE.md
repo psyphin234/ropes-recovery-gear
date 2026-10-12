@@ -2,7 +2,13 @@
 
 Static page for 4x4 **kinetic recovery gear**, part of the PsyPhin site: what a snatch puts through a snatch strap or kinetic rope and its shackles, which strap or rope suits the two vehicles, and what the three "safety straps" are each for (damper, tree protector, bridle). Started 2026-10-12, in the same design as the winching page (`../Winch_Calc`, https://winching.psyphin.co.za/), reusing the strap and kinetic material that page dropped (its commit 8565449 and before).
 
-**Not linked anywhere yet:** no card on psyphin.co.za (owner's call, 2026-10-12), no GitHub repo, no address. When it gets one, add `<link rel="canonical">` and Open Graph tags to both pages as on the winching page (they're left out until the address is known).
+Repo `psyphin234/ropes-recovery-gear` (public), GitHub Pages from `main` / root, since 2026-10-12. Push to `main` to deploy (ask the owner first); check with `gh api repos/psyphin234/ropes-recovery-gear/pages/builds/latest`.
+
+**Address: https://ropes.psyphin.co.za/** (the `CNAME` file here, plus the Afrihost CNAME `ropes.psyphin.co.za` → `psyphin234.github.io`, which was already in place). Both pages carry `<link rel="canonical">` and Open Graph tags for it; no share image yet.
+
+**No card on psyphin.co.za yet** (owner's call, 2026-10-12, repeated the same day). Don't add one until asked.
+
+**Danger warnings (owner's requirement, 2026-10-12):** the site must say plainly that recovery is dangerous, that it's for information only, and that judgement on the scene overrides it. That's the red `.danger` box under the intro on both pages, the line under every verdict, the disclaimer (no liability) and the footer. Keep them.
 
 Plain HTML/CSS/vanilla JS, classic scripts (no modules, no build step), so `index.html` opens straight from disk. Inputs are only kept in the visitor's own `localStorage` (key `ropes-recovery-v1`).
 

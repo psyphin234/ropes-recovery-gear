@@ -217,7 +217,7 @@
     renderDamper();
     renderTree();
     renderBridle();
-    $("stage-sources").replaceChildren(U.sourcesLine(["strap-mbs", "kinetic-size", "strap-stretch", "kinetic-stretch", "static-stretch", "kinetic-model", "never-exceed", "recovery-point", "shackle-ratings", "shackle-side-load", "soft-shackles", "no-shackle-join", "damper", "stand-clear", "strap-wet", "strap-life", "tree-protector", "bridle", "leg-load", "shackle-included-angle", "wll-mbs"]));
+    $("stage-sources").replaceChildren(U.sourcesLine(["training", "strap-mbs", "kinetic-size", "strap-stretch", "kinetic-stretch", "static-stretch", "kinetic-model", "never-exceed", "recovery-point", "shackle-ratings", "shackle-side-load", "soft-shackles", "no-shackle-join", "damper", "stand-clear", "strap-wet", "strap-life", "tree-protector", "bridle", "leg-load", "shackle-included-angle", "wll-mbs"]));
   }
 
   function placeOverlays(pos) {
@@ -275,7 +275,8 @@
       el("strong", { class: "bal-val" }, el("span", { class: "bal-ok tone-" + (l.ok ? "pass" : "fail") }, U.statusIcon(l.ok ? "pass" : "fail")), t1(l.kg)))));
 
     const sub = el("p", { class: "verdict-sub" },
-      `The ${t1(R.recv)} recovery vehicle at ${speed} km/h carries ${U.n(kin.energyJ / 1000, 0.1)} kJ; the ${gear.short.toLowerCase()} (${U.n(R.len, 0.1)} m, ${Math.round(R.stretch * 1000) / 10}% stretch at break) soaks it up as stretch and gives it back as pull. Worked out with the stuck vehicle held still, the hardest case: a calculation, not a measurement. The line on each bar is the peak force.`);
+      `The ${t1(R.recv)} recovery vehicle at ${speed} km/h carries ${U.n(kin.energyJ / 1000, 0.1)} kJ; the ${gear.short.toLowerCase()} (${U.n(R.len, 0.1)} m, ${Math.round(R.stretch * 1000) / 10}% stretch at break) soaks it up as stretch and gives it back as pull. Worked out with the stuck vehicle held still, the hardest case: a calculation, not a measurement. The line on each bar is the peak force.`,
+      el("strong", { class: "verdict-warn" }, " For information only: whatever this says, judge the recovery on the scene."));
 
     let fixEl = null;
     if (fix && fix.patch) {
