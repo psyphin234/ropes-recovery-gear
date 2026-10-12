@@ -12,8 +12,8 @@
   const { el, externalLink } = U;
 
   const GROUPS = [
-    { category: "standard", title: "Standards", intro: "Australia's mandatory standard for recovery straps: what every strap and its instructions must say. We found no South African equivalent." },
-    { category: "maker", title: "Manufacturers", intro: "Figures and instructions published by strap, rope, shackle and winch makers. SECURETECH (South Africa) is the main source; other makers fill in what it doesn't publish online. Your own gear's label or manual beats these." },
+    { category: "maker", title: "Manufacturers", intro: "Figures and instructions published by strap, rope, shackle and winch makers. South African sources come first, SECURETECH above all; other makers fill in what it doesn't publish online. Your own gear's label or manual beats these." },
+    { category: "standard", title: "Standards", intro: "Australia's mandatory standard for recovery straps, used only where no South African source publishes anything: we found no South African equivalent." },
     { category: "calculation", title: "This site's calculations", intro: "Plain physics (statics and energy) applied by this site. Not from a source as such, so they're listed separately and labelled where they're used." },
   ];
 
@@ -37,7 +37,9 @@
 
   const root = document.getElementById("source-groups");
   GROUPS.forEach((g) => {
-    const rules = D.rules.filter((r) => r.category === g.category);
+    // South African-led rules first (by their first source), keeping data.js order otherwise
+    const za = (r) => (D.sources[r.sources[0]].country === "ZA" ? 0 : 1);
+    const rules = D.rules.filter((r) => r.category === g.category).map((r, i) => ({ r, i })).sort((a, b) => za(a.r) - za(b.r) || a.i - b.i).map((x) => x.r);
     if (!rules.length) return;
     root.appendChild(
       el("section", { class: "source-group", id: "group-" + g.category },
@@ -57,7 +59,7 @@
   root.appendChild(
     el("section", { class: "source-group", id: "all-sources" },
       el("h2", null, "Every source"),
-      el("ul", { class: "source-list" }, Object.keys(D.sources).map((id) => el("li", { class: "source-item" }, el("ul", { class: "source-meta plain-list" }, sourceItem(id)), U.categoryTag(D.sources[id].kind)))))
+      el("ul", { class: "source-list" }, Object.keys(D.sources).sort((x, y) => (D.sources[x].country === "ZA" ? 0 : 1) - (D.sources[y].country === "ZA" ? 0 : 1)).map((id) => el("li", { class: "source-item" }, el("ul", { class: "source-meta plain-list" }, sourceItem(id)), U.categoryTag(D.sources[id].kind)))))
   );
 
   // Arriving from a "Sources:" link: show the rule.

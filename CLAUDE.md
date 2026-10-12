@@ -21,6 +21,10 @@ Plain HTML/CSS/vanilla JS, classic scripts (no modules, no build step), so `inde
 - Where nothing citable exists, add a `gaps` entry and say "no published figure" on the page. Current gaps: speed, how much weaker a wet strap is, how to fit a safety lanyard, each strap's stretch curve, your recovery points' rating, a WLL for tree protectors, soft shackle side loading.
 - Rule `category`: standard | maker | calculation. **calculation** = this site's own physics; it must cite `physics` and say so where shown.
 
+## Source order: South Africa first (owner, 2026-10-12)
+
+South African sources take preference, SECURETECH above all. Australian sources (the strap standard, Bushranger) only where no South African source publishes anything; other makers fill gaps the same way. Every source in data.js has a `country`; sources.html lists Manufacturers before Standards and puts ZA-led rules and sources first.
+
 ## SECURETECH is the lead source; metric only (owner's calls, 2026-10-12)
 
 The owner has been to SECURETECH's warehouse (South Africa), seen its manufacturing and testing, dealt with the manager, and uses mostly SECURETECH gear: reference SECURETECH first for data and facts. Read from securetech.co.za on 2026-10-12: the Safety & Downloads guidelines page (`stGuide`) and product pages (kinetic strap 20–30%, kinetic rope 30–40% / 35–40%, rated alloy bow shackles 2–8.5 t WLL to Fed Spec RR-C-271b, bridles 10.5 t / 16 t for vehicles to 2 625 / 4 000 kg, tree protector 100 mm × 2–4 m, lanyard tied with two ring hitch knots, stand-off 2 × the length, rest 8 h per 10% of stretch). The shop API (`/wp-json/wc/store/v1/products`) returns the product texts. SECURETECH publishes no strength online for its tree protector, soft shackle or lanyard: WARN's Epic and Factor 55's figures fill those, labelled. The stretch figures are taken at the low end of SECURETECH's ranges (the higher force). The guidelines also recommend recovery blankets: left out (see No dampers).

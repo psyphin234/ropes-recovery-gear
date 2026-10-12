@@ -8,9 +8,10 @@
  *   maker       - a strap, rope, shackle or winch maker's published figure or instruction
  *   calculation - this site's own physics; says so wherever it is shown
  *
- * SECURETECH (South Africa) is the lead source (owner's call, 2026-10-12: the
- * owner has seen their manufacturing and testing and uses their gear). Other
- * makers and the Australian standard fill in what SECURETECH doesn't publish.
+ * Source order (owner's call, 2026-10-12): South African sources first, and
+ * SECURETECH above all (the owner has seen its manufacturing and testing and
+ * uses its gear). Australian sources only where no South African one publishes
+ * anything; other makers likewise fill gaps. Each source carries its `country`.
  *
  * Source policy: engineering, standards, manufacturers' data and published
  * methods only. No forum, club or "everyone says" figures. Where nothing
@@ -27,92 +28,110 @@
     strapStandard: {
       label: "Australia: Consumer Goods (Motor Vehicle Recovery Straps) Safety Standard 2017 (F2017L01560), Federal Register of Legislation",
       url: "https://www.legislation.gov.au/F2017L01560/asmade/text",
+      country: "AU",
       kind: "standard",
     },
     bushranger: {
       label: "Bushranger 4x4 Gear, snatch strap instructions (the maker's sheet, with the wording the Australian standard requires), via Snowys",
       url: "https://snowys.com.au/Product/ProductAttachments/cbc1afcc-ed75-446f-87dd-04bcba61608e",
+      country: "AU",
       kind: "maker",
     },
     f55: {
       label: "Factor 55, kinetic recovery ropes, bridles and Extreme Duty soft shackles (\"F55 Industrial Kinetic Rope\"), on WARN's literature site",
       url: "https://literature.warn.com/view/108208635/",
+      country: "US",
       kind: "maker",
     },
     samsonAmsteel: {
       label: "Samson Rope, AmSteel-Blue (12-strand Dyneema SK78) specifications",
       url: "https://www.samsonrope.com/amsteel--blue",
+      country: "US",
       kind: "maker",
     },
     samsonWarning: {
       label: "Samson Rope, Warning statement (working loads, shock loading, recoil)",
       url: "https://www.samsonrope.com/warning-statement",
+      country: "US",
       kind: "maker",
     },
     crosby: {
       label: "Crosby (Kito Crosby), G-209 / S-209 Screw Pin Anchor Shackles",
       url: "https://kitocrosby.com/product/crosby-g-209-s-209-screw-pin-anchor-shackles/",
+      country: "US",
       kind: "maker",
     },
     crosbyRigging: {
       label: "Crosby 2022 catalogue, Applications & Warnings: Shackles, p. 362 (rigging practice)",
       url: "https://www.thecrosbygroup.com/wp-content/uploads/catalog/2022/en-US/362.pdf",
+      country: "US",
       kind: "maker",
     },
     crosbySideLoad: {
       label: "Crosby 2022 catalogue, Applications & Warnings: Shackles, p. 364 (side loading, included angle)",
       url: "https://www.thecrosbygroup.com/wp-content/uploads/catalog/2022/en-US/364.pdf",
+      country: "US",
       kind: "maker",
     },
     stGuide: {
       label: "SECURETECH (South Africa), Safety & Downloads: recovery and safety guidelines",
       url: "https://securetech.co.za/safety-downloads/",
+      country: "ZA",
       kind: "maker",
     },
     stHandbook: {
       label: "SECURETECH, Recovery Handbook (request page)",
       url: "https://securetech.co.za/blog/2017/february/16/securetech-recovery-handbook",
+      country: "ZA",
       kind: "maker",
     },
     stKineticStrap: {
       label: "SECURETECH, Kinetic Strap",
       url: "https://securetech.co.za/product/kinetic-strap/",
+      country: "ZA",
       kind: "maker",
     },
     stKineticRope: {
       label: "SECURETECH, Kinetic rope",
       url: "https://securetech.co.za/product/kinetic-rope/",
+      country: "ZA",
       kind: "maker",
     },
     stShackle: {
       label: "SECURETECH, Rated Alloy Recovery Bow Shackle",
       url: "https://securetech.co.za/product/rated-alloy-recovery-bow-shackle-copy/",
+      country: "ZA",
       kind: "maker",
     },
     stLanyard: {
       label: "SECURETECH, Recovery Safety Lanyard",
       url: "https://securetech.co.za/product/recovery-safety-lanyard/",
+      country: "ZA",
       kind: "maker",
     },
     stBridle: {
       label: "SECURETECH, Recovery Bridle",
       url: "https://securetech.co.za/product/recovery-bridle/",
+      country: "ZA",
       kind: "maker",
     },
     stTree: {
       label: "SECURETECH, Tree Trunk Protector",
       url: "https://securetech.co.za/product/tree-trunk-protector/",
+      country: "ZA",
       kind: "maker",
     },
     warnRigging: {
       label: "WARN Industries, Basic Guide to Winch Rigging",
       url: "https://www.warn.com/basic-guide-to-winch-rigging",
+      country: "US",
       kind: "maker",
     },
     warnEpic: {
       label: "WARN Industries, Epic Tree Trunk Protector listings (25, 51 and 102 mm wide, 2.4 m long)",
       url: "https://www.warn.com/products/epic-tree-trunk-protector-1-x-8-92094",
       moreUrls: ["https://www.warn.com/products/epic-rigging-strap-2-x-8-92095", "https://www.warn.com/products/epic-rigging-strap-4-x-8-92096"],
+      country: "US",
       kind: "maker",
     },
     physics: {
