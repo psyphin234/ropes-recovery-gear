@@ -8,7 +8,7 @@ Repo `psyphin234/ropes-recovery-gear` (public), GitHub Pages from `main` / root,
 
 **Card on psyphin.co.za** (Tools section) since 2026-10-12, at the owner's request: titled **Ropes and Shackles** (the page's own name too, since 2026-10-12; it was "Ropes & Recovery Gear"; the repo and the `ropes-recovery-v1` key keep the old name), amber "Under construction" tag, image `assets/img/projects/ropes-recovery-gear.jpg` there (this page's scene rendered at 800x450, kinetic rope tight, extra sky for 16:9). Edit it in that repo's `projects.js`.
 
-**Danger warnings (owner's requirement, 2026-10-12):** the site must say plainly that recovery is dangerous, that it's for information only, and that judgement on the scene overrides it. That's the red `.danger` box under the intro on both pages, the line under every verdict, the disclaimer (no liability) and the footer. Keep them.
+**Danger warnings (owner's requirement, 2026-10-12):** the site must say plainly that recovery is dangerous, that it's for information only, and that judgement on the scene overrides it. That's the red `.danger` box under the intro on both pages (kept compact at the owner's request, 2026-10-12: those three points stay visible, the detail and SECURETECH's advice fold into "Why, and what to do"), the line under every verdict, the disclaimer (no liability) and the footer. Keep them.
 
 Plain HTML/CSS/vanilla JS, classic scripts (no modules, no build step), so `index.html` opens straight from disk. Inputs are only kept in the visitor's own `localStorage` (key `ropes-recovery-v1`).
 
