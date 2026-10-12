@@ -69,6 +69,11 @@
       url: "https://securetech.co.za/safety-downloads/",
       kind: "maker",
     },
+    stHandbook: {
+      label: "SECURETECH, Recovery Handbook (request page)",
+      url: "https://securetech.co.za/blog/2017/february/16/securetech-recovery-handbook",
+      kind: "maker",
+    },
     stKineticStrap: {
       label: "SECURETECH, Kinetic Strap",
       url: "https://securetech.co.za/product/kinetic-strap/",
@@ -271,11 +276,11 @@
     },
     {
       id: "training",
-      category: "standard",
+      category: "maker",
       title: "Get trained",
-      summary: "The standard requires every strap's instructions to tell users to consider a nationally recognised four-wheel drive training course, or to contact a four-wheel drive club, for advice on choosing and using the strap. This page is no substitute for that.",
-      quote: "state that persons intending to use the strap should consider completing a nationally recognised fourwheel drive training course, or contact a fourwheel drive club for comprehensive advice on the proper selection and use of the strap",
-      sources: ["strapStandard", "bushranger"],
+      summary: "SECURETECH: besides reading its Recovery Handbook, attend a professional 4x4 recovery course; SECURETECH runs courses itself. This page is no substitute for that.",
+      quote: "In addition to reading the SECURETECH Recovery Handbook you should attend a professional 4×4 recovery course (contact us for details on our next course.)",
+      sources: ["stHandbook"],
       params: {},
       checked: "2026-10-12",
     },

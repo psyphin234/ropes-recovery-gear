@@ -25,6 +25,8 @@ Plain HTML/CSS/vanilla JS, classic scripts (no modules, no build step), so `inde
 
 The owner has been to SECURETECH's warehouse (South Africa), seen its manufacturing and testing, dealt with the manager, and uses mostly SECURETECH gear: reference SECURETECH first for data and facts. Read from securetech.co.za on 2026-10-12: the Safety & Downloads guidelines page (`stGuide`) and product pages (kinetic strap 20–30%, kinetic rope 30–40% / 35–40%, rated alloy bow shackles 2–8.5 t WLL to Fed Spec RR-C-271b, bridles 10.5 t / 16 t for vehicles to 2 625 / 4 000 kg, tree protector 100 mm × 2–4 m, lanyard tied with two ring hitch knots, stand-off 2 × the length, rest 8 h per 10% of stretch). The shop API (`/wp-json/wc/store/v1/products`) returns the product texts. SECURETECH publishes no strength online for its tree protector, soft shackle or lanyard: WARN's Epic and Factor 55's figures fill those, labelled. The stretch figures are taken at the low end of SECURETECH's ranges (the higher force). The guidelines also recommend recovery blankets: left out (see No dampers).
 
+**No Australian training advice** (owner, 2026-10-12: South Africa has no 4x4 training authority). The `training` rule cites SECURETECH's handbook page ("attend a professional 4×4 recovery course"), not the Australian standard.
+
 **Metric only on the page:** sizes in mm and m, strengths in kg and t. Makers' lb/inch figures stay only inside quotes; data keeps them as published (`breakLb`) and converts.
 
 ## Sources used (all in data.js, read 2026-10-12)
