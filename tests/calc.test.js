@@ -1,0 +1,188 @@
+/*
+ * Tests for data.js and calc.js. Runs in the browser via tests/index.html
+ * (open it, or run tests/run.ps1 for a headless run).
+ */
+(function () {
+  "use strict";
+
+  const D = window.ROPES_DATA;
+  const C = window.ROPES_CALC;
+  const G = D.units.g;
+  const results = [];
+  window.addEventListener("error", (e) => {
+    document.getElementById("summary").textContent = "FAILED: script error: " + e.message;
+  });
+
+  function test(name, fn) {
+    try {
+      fn();
+      results.push({ name, ok: true });
+    } catch (e) {
+      results.push({ name, ok: false, error: e.message });
+    }
+  }
+
+  function eq(actual, expected, what) {
+    if (actual !== expected) throw new Error(`${what || "value"}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+  }
+
+  function near(actual, expected, tol, what) {
+    const rel = Math.abs(actual - expected) / Math.max(Math.abs(expected), 1e-9);
+    if (!(rel <= tol)) throw new Error(`${what || "value"}: expected ${expected} within ${tol * 100}%, got ${actual}`);
+  }
+
+  // ------------------------------------------------------------ data integrity
+  test("every rule has its fields and known sources", () => {
+    const cats = ["standard", "maker", "calculation"];
+    D.rules.forEach((r) => {
+      ["id", "category", "title", "summary", "checked"].forEach((f) => {
+        if (!r[f]) throw new Error(r.id + " missing " + f);
+      });
+      if (cats.indexOf(r.category) === -1) throw new Error(r.id + " has unknown category");
+      if (!r.sources.length) throw new Error(r.id + " has no source");
+      r.sources.forEach((s) => {
+        if (!D.sources[s]) throw new Error(r.id + " cites unknown source " + s);
+      });
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(r.checked)) throw new Error(r.id + ".checked must be YYYY-MM-DD");
+      if (r.category !== "calculation" && !r.quote) throw new Error(r.id + " quotes nothing from its source");
+    });
+  });
+
+  test("rule ids are unique", () => {
+    const ids = D.rules.map((r) => r.id);
+    eq(new Set(ids).size, ids.length, "unique ids");
+  });
+
+  test("calculation rules cite the site's own physics", () => {
+    D.rules.filter((r) => r.category === "calculation").forEach((r) => {
+      if (r.sources.indexOf("physics") === -1) throw new Error(r.id + " is a calculation but doesn't cite physics");
+    });
+  });
+
+  test("every gear type's stretch and size rules exist", () => {
+    D.gearTypes.forEach((g) => {
+      D.rule(g.stretchRule);
+      if (g.sizeRule) D.rule(g.sizeRule);
+    });
+  });
+
+  test("Factor 55's WLLs are their breaking strengths ÷ 5", () => {
+    D.softShackles.concat(D.bridles).forEach((s) => eq(s.breakLb / 5, s.wllLb, s.id));
+  });
+
+  test("scenarios use known gear and shackles", () => {
+    const ids = C.shackles(0).map((s) => s.id);
+    D.scenarios.forEach((sc) => {
+      if (!C.gear(sc.values.gear)) throw new Error(sc.id + " gear");
+      if (ids.indexOf(sc.values.shackle) === -1) throw new Error(sc.id + " shackle");
+    });
+  });
+
+  // ------------------------------------------------------------ sizing
+  test("strap standard: 2 to 3 × the lighter vehicle", () => {
+    const r = C.sizeRange("strap", 2900);
+    eq(r.minKg, 5800, "min");
+    eq(r.maxKg, 8700, "max");
+    eq(C.rangeVerdict(8000, r), "in", "8 t");
+    eq(C.rangeVerdict(5000, r), "under", "5 t");
+    eq(C.rangeVerdict(11000, r), "over", "11 t");
+  });
+
+  test("Factor 55: 4 to 6 × for kinetic ropes, 2 to 4 × for heavy vehicles; none for winch rope", () => {
+    const r = C.sizeRange("kinetic", 2000);
+    eq(r.minKg, 8000, "min");
+    eq(r.maxKg, 12000, "max");
+    eq(r.heavy.minKg, 4000, "heavy min");
+    eq(C.sizeRange("static", 2000), null, "winch rope");
+  });
+
+  // ------------------------------------------------------------ the kinetic model
+  test("kinetic: worked example (3 100 kg at 10 km/h on an 8 t, 9 m strap, 20%)", () => {
+    const k = C.kinetic({ massKg: 3100, mbsKg: 8000, lengthM: 9, stretch: 0.2, speedKmh: 10 });
+    const stiff = (8000 * G) / (9 * 0.2);
+    near(k.stiffNPerM, stiff, 1e-9, "stiffness");
+    near(k.peakKg, ((10 / 3.6) * Math.sqrt(3100 * stiff)) / G, 1e-9, "peak");
+    near(k.peakKg, 3292, 0.002, "about 3.29 t");
+    eq(k.breaks, false, "doesn't break");
+  });
+
+  test("kinetic: all the energy is in the strap at the peak", () => {
+    const k = C.kinetic({ massKg: 2500, mbsKg: 9000, lengthM: 9, stretch: 0.3, speedKmh: 12 });
+    const peak = k.at(k.tPeak);
+    near(peak.energyJ, k.energyJ, 1e-6, "½kx² = ½mv²");
+    near(peak.forceKg, k.peakKg, 1e-6, "force at tPeak");
+    if (Math.abs(peak.speedKmh) > 1e-6) throw new Error("the recovery vehicle has stopped at the peak");
+  });
+
+  test("kinetic: twice the speed, twice the force", () => {
+    const a = C.kinetic({ massKg: 3000, mbsKg: 8000, lengthM: 9, stretch: 0.2, speedKmh: 5 });
+    const b = C.kinetic({ massKg: 3000, mbsKg: 8000, lengthM: 9, stretch: 0.2, speedKmh: 10 });
+    near(b.peakKg, 2 * a.peakKg, 1e-9, "linear in speed");
+  });
+
+  test("kinetic: speedFor(MBS) is where it breaks", () => {
+    const a = C.kinetic({ massKg: 3000, mbsKg: 8000, lengthM: 9, stretch: 0.2, speedKmh: 10 });
+    const v = a.speedFor(8000);
+    const at = C.kinetic({ massKg: 3000, mbsKg: 8000, lengthM: 9, stretch: 0.2, speedKmh: v * 1.01 });
+    eq(at.breaks, true, "just over breaks");
+    near(at.peakKg, 8000, 1e-9, "peak capped at MBS when it breaks");
+    near(at.peakStretchM, 9 * 0.2, 1e-9, "breaks at its rated stretch");
+    near(at.breakEnergyJ, 0.5 * 8000 * G * 1.8, 1e-9, "energy let go");
+    eq(C.kinetic({ massKg: 3000, mbsKg: 8000, lengthM: 9, stretch: 0.2, speedKmh: v * 0.99 }).breaks, false, "just under holds");
+  });
+
+  test("winch rope (static) peaks √(20% ÷ 3.2%) = 2.5 × a snatch strap", () => {
+    near(C.stretchOf("static"), 0.032, 1e-9, "Samson 0.96% at 30%");
+    const s = C.kinetic({ massKg: 3000, mbsKg: 8000, lengthM: 9, stretch: C.stretchOf("strap"), speedKmh: 8 });
+    const w = C.kinetic({ massKg: 3000, mbsKg: 8000, lengthM: 9, stretch: C.stretchOf("static"), speedKmh: 8 });
+    near(w.peakIfUnbrokenKg / s.peakIfUnbrokenKg, 2.5, 1e-9, "ratio");
+  });
+
+  test("kinetic: missing inputs give null", () => {
+    eq(C.kinetic({ massKg: 0, mbsKg: 8000, lengthM: 9, stretch: 0.2, speedKmh: 10 }), null, "no mass");
+    eq(C.kinetic({ massKg: 3000, mbsKg: 8000, lengthM: 0, stretch: 0.2, speedKmh: 10 }), null, "no length");
+  });
+
+  // ------------------------------------------------------------ shackles and legs
+  test("Crosby side loading chart", () => {
+    eq(C.sideLoadKeep(0), 1, "in-line");
+    eq(C.sideLoadKeep(10), 1, "10°");
+    eq(C.sideLoadKeep(11), 0.85, "11°");
+    eq(C.sideLoadKeep(45), 0.7, "45°");
+    eq(C.sideLoadKeep(90), 0.5, "90°");
+    eq(C.sideLoadKeep(95), null, "past the chart");
+  });
+
+  test("shackles: steel WLL drops with side load, breaks at 6 × rated WLL; soft unchanged", () => {
+    const s = C.shackles(45);
+    const g = s.find((x) => x.id === "g209-3/4");
+    near(g.wllKg, 4750 * 0.7, 1e-9, "3/4\" at 45°");
+    near(g.breakKg, 4750 * 6, 1e-9, "3/4\" breaks");
+    const f = s.find((x) => x.id === "f55-3/8");
+    near(f.wllKg, C.lbToKg(8700), 1e-9, "soft WLL");
+    eq(f.sideUnknown, true, "flagged: no side-load figure");
+  });
+
+  test("leg load: half side by side, 71% at 90°, all of it at 120°", () => {
+    near(C.legLoad(1000, 0), 500, 1e-9, "0°");
+    near(C.legLoad(1000, 90), 707.1, 1e-4, "90°");
+    near(C.legLoad(1000, 120), 1000, 1e-9, "120°");
+  });
+
+  test("stand-off: 1.5 × the stretched length", () => {
+    near(C.standOff(9, 0.6), 14.4, 1e-9, "9 m strap stretched 0.6 m");
+  });
+
+  // ------------------------------------------------------------ report
+  const failed = results.filter((r) => !r.ok);
+  const list = document.getElementById("results");
+  results.forEach((r) => {
+    const li = document.createElement("li");
+    li.className = r.ok ? "ok" : "bad";
+    li.textContent = (r.ok ? "PASS  " : "FAIL  ") + r.name + (r.ok ? "" : "  -> " + r.error);
+    list.appendChild(li);
+  });
+  document.getElementById("summary").textContent = failed.length
+    ? `FAILED: ${failed.length} of ${results.length} tests`
+    : `ALL PASSED: ${results.length} tests`;
+})();

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ropes &amp; Recovery Gear | PsyPhin</title>
+  <meta name="description" content="Snatch straps, kinetic ropes, shackles, dampers, tree protectors and bridles: what a kinetic recovery puts through them and which ones suit your vehicles. From the Australian strap standard, makers' data and physics, with a source for every number.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#020203">
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="icon" href="favicon-96x96.png" type="image/png" sizes="96x96">
+  <link rel="icon" href="favicon-192x192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="construction" role="alert">
+    <strong>Under construction.</strong> Not finished or checked yet. The numbers may be wrong: don't rely on this page for a real recovery.
+  </div>
+
+  <header class="brand-bar">
+    <div class="brand-nav">
+      <a class="back-link" href="https://psyphin.co.za/#tools"><span class="back-link-arrow" aria-hidden="true">&larr;</span> <span class="back-link-label"><span class="back-link-more">More </span>PsyPhin tools</span> <span class="back-link-domain">psyphin.co.za</span></a>
+      <nav class="nav" aria-label="Site">
+        <a href="index.html" aria-current="page">Calculator</a>
+        <a href="sources.html">Sources</a>
+      </nav>
+    </div>
+    <div class="brand-inner">
+      <a class="brand-logo-link" href="https://psyphin.co.za/" aria-label="PsyPhin home"><img src="logo.jpg" alt="PsyPhin" class="brand-logo" width="560" height="501"></a>
+      <div class="brand-text">
+        <p class="brand-eyebrow">4x4 recovery &middot; Ropes, straps &amp; shackles</p>
+        <h1>Ropes &amp; Recovery Gear</h1>
+        <p class="subtitle">What a snatch puts through your strap or kinetic rope and its shackles, which ones suit your two vehicles, and what dampers, tree protectors and bridles are each for. With a source for every number.</p>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <section class="intro">
+      <p class="lede">Set up the snatch on the picture: type both vehicles' mass and the strap's breaking strength on them, pick the strap or rope, and drag the speed. Everything updates as you go.</p>
+      <p class="privacy">Worked out in your browser; nothing you enter is sent anywhere. <a href="#disclaimer">Disclaimer</a> &middot; <a href="sources.html">Where every number comes from</a></p>
+    </section>
+
+    <div class="stage" id="stage">
+      <div class="try" id="try"><span class="try-label">Try:</span></div>
+
+      <!-- 1. The snatch: side view, with the masses and the strap typed onto it -->
+      <div class="scene" id="scene">
+        <div class="scene-pic" id="scene-pic">
+          <div class="scene-fields">
+            <label class="scene-field" id="f-stuck">
+              <span class="sf-label">Stuck vehicle</span>
+              <span class="sf-input"><input id="stuckKg" type="number" inputmode="numeric" min="0" step="50" autocomplete="off"><span>kg</span></span>
+              <span class="sf-hint">GVM, or weighbridge</span>
+            </label>
+            <label class="scene-field" id="f-rec">
+              <span class="sf-label">Recovery vehicle</span>
+              <span class="sf-input"><input id="recKg" type="number" inputmode="numeric" min="0" step="50" autocomplete="off"><span>kg</span></span>
+              <span class="sf-hint">the one that pulls</span>
+            </label>
+            <div class="scene-field scene-field--strap" id="f-strap">
+              <span class="sf-label" id="strap-label">Strap</span>
+              <label class="sf-input"><input id="mbsKg" type="number" inputmode="numeric" min="0" step="100" autocomplete="off" aria-labelledby="strap-label mbs-unit"><span id="mbs-unit">kg MBS</span></label>
+              <label class="sf-input sf-input--small"><input id="lengthM" type="number" inputmode="decimal" min="1" step="0.5" autocomplete="off" aria-labelledby="strap-label len-unit"><span id="len-unit">m long</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="ctl ctl--gear">
+          <span class="ctl-label" id="gear-label">On the vehicles</span>
+          <div class="chips" id="gear-chips" role="radiogroup" aria-labelledby="gear-label"></div>
+        </div>
+        <div class="ctl ctl--speed">
+          <span class="ctl-label" id="speed-label">Speed when it goes tight</span>
+          <div class="slider">
+            <input type="range" id="speedKmh" min="1" max="30" step="1" aria-labelledby="speed-label">
+            <output id="speed-out" for="speedKmh"></output>
+          </div>
+        </div>
+      </div>
+
+      <div class="verdict" id="verdict" role="status" aria-live="polite"></div>
+
+      <!-- 2. The snatch, moment by moment -->
+      <div class="part" id="play-part">
+        <p class="part-label">The snatch, moment by moment</p>
+        <div class="play">
+          <figure class="gauge-box">
+            <p class="box-title">Force in the strap</p>
+            <div id="gauge"></div>
+            <figcaption><strong id="force-now">0 kg</strong><span id="force-sub">force now</span></figcaption>
+            <ul class="gauge-legend" id="gauge-legend"></ul>
+          </figure>
+          <div class="play-main">
+            <div id="chart-snatch"></div>
+            <div class="play-bar">
+              <button type="button" class="play-button" id="play">&#9654; Play the snatch</button>
+              <span class="hint play-slow" id="play-slow"></span>
+            </div>
+          </div>
+        </div>
+        <div class="readouts" id="readouts"></div>
+      </div>
+
+      <!-- 3. Strap or rope for these vehicles -->
+      <div class="part" id="size-part">
+        <p class="part-label">Strap or rope for these two vehicles</p>
+        <div id="sizes"></div>
+      </div>
+
+      <!-- 4. Shackles -->
+      <div class="part" id="shackle-part">
+        <p class="part-label">Shackles, steel and soft</p>
+        <div class="shackle-top">
+          <div class="ctl ctl--side">
+            <span class="ctl-label" id="side-label">Pull on the shackle <small>off in-line</small></span>
+            <div class="slider slider--pic">
+              <span id="side-view"></span>
+              <input type="range" id="sideDeg" min="0" max="90" step="1" aria-labelledby="side-label">
+              <output id="side-out" for="sideDeg"></output>
+            </div>
+          </div>
+          <div class="ctl ctl--point">
+            <label class="ctl-label" for="pointKg">Recovery points rated <small>if you know it</small></label>
+            <span class="mini-field"><input id="pointKg" type="number" inputmode="numeric" min="0" step="100" placeholder="–"><span>kg</span></span>
+          </div>
+        </div>
+        <ul class="shackles" id="shackles" role="radiogroup" aria-label="Shackle used"></ul>
+        <div id="shackle-notes"></div>
+      </div>
+
+      <!-- 5. Safety straps: three different jobs -->
+      <div class="part" id="safety-part">
+        <p class="part-label">Safety straps: three different jobs</p>
+        <p class="hint part-intro">A damper, a tree protector and a bridle all look like short straps, but each does a different job and is rated differently. Don't swap one for another.</p>
+        <div class="jobs">
+          <section class="job" id="job-damper" aria-labelledby="job-damper-title">
+            <h3 class="job-title" id="job-damper-title"><span class="job-num">1</span> Damper <small>soaks up recoil</small></h3>
+            <div class="job-pic" id="damper-pic"></div>
+            <div class="job-body" id="damper-body"></div>
+          </section>
+          <section class="job" id="job-tree" aria-labelledby="job-tree-title">
+            <h3 class="job-title" id="job-tree-title"><span class="job-num">2</span> Tree protector <small>ties the rope to the anchor</small></h3>
+            <div class="job-pic" id="tree-pic"></div>
+            <div class="job-controls">
+              <label class="mini-field">Pull on the anchor <input id="treePullKg" type="number" inputmode="numeric" min="0" step="50"><span>kg</span></label>
+              <p class="hint">On a single line, at most your winch's rated pull (4 310 kg is a 9 500 lb winch).</p>
+              <div class="chips chips--small" id="protector-chips" role="radiogroup" aria-label="Tree protector"></div>
+              <div class="slider">
+                <input type="range" id="treeDeg" min="0" max="150" step="5" aria-label="Angle between the protector's two ends">
+                <output id="tree-out" for="treeDeg"></output>
+              </div>
+            </div>
+            <div class="job-body" id="tree-body"></div>
+          </section>
+          <section class="job" id="job-bridle" aria-labelledby="job-bridle-title">
+            <h3 class="job-title" id="job-bridle-title"><span class="job-num">3</span> Bridle <small>shares the pull between two points</small></h3>
+            <div class="job-pic" id="bridle-pic"></div>
+            <div class="job-controls">
+              <div class="chips chips--small" id="bridle-chips" role="radiogroup" aria-label="Bridle"></div>
+              <div class="slider">
+                <input type="range" id="bridleDeg" min="0" max="150" step="5" aria-label="Angle between the bridle's legs">
+                <output id="bridle-out" for="bridleDeg"></output>
+              </div>
+            </div>
+            <div class="job-body" id="bridle-body"></div>
+          </section>
+        </div>
+      </div>
+
+      <div id="stage-sources"></div>
+    </div>
+
+    <aside id="disclaimer" class="disclaimer" aria-labelledby="disclaimer-title">
+      <h2 id="disclaimer-title">Disclaimer</h2>
+      <p><strong>An estimate, not a guarantee.</strong> The peak force comes from a simple physics model, and straps, ropes and recovery points vary. Every figure is linked to its source, but a real snatch can load gear harder than this page shows.</p>
+      <p>Use rated recovery points and rated gear, keep everyone well clear, drape a damper over the strap, and follow the instructions that came with your gear.</p>
+    </aside>
+
+    <section class="explainers" aria-label="Explainers">
+      <details class="explainer" id="explain-model">
+        <summary>Why speed matters so much</summary>
+        <div class="explainer-body"></div>
+      </details>
+      <details class="explainer" id="explain-mbs">
+        <summary>Breaking strength (MBS) and WLL</summary>
+        <div class="explainer-body"></div>
+      </details>
+      <details class="explainer" id="explain-gaps">
+        <summary>What this page can't tell you</summary>
+        <div class="explainer-body"></div>
+      </details>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>An estimate, not a guarantee. <a href="sources.html">Sources for every number</a>.</p>
+      <p>&copy; <span id="year"></span> PsyPhin</p>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/calc.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/diagrams.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- GoatCounter: cookie-free page-visit stats at https://psyphin.goatcounter.com/ (never sees form inputs) -->
+  <!-- Shared with psyphin.co.za: prefix paths with the host so this site's "/" is counted separately -->
+  <script>window.goatcounter = { path: function (p) { return location.host + p; } };</script>
+  <script data-goatcounter="https://psyphin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
