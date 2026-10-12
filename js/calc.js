@@ -30,7 +30,7 @@
   /*
    * The breaking strength SECURETECH asks for, from the stuck vehicle's mass:
    * its lowest noted factor of safety (2:1) and the one it recommends (4:1).
-   * Winch rope: none. Returns { ruleId, min, rec, minKg, recKg } or null.
+   * Static pull strap: none. Returns { ruleId, min, rec, minKg, recKg } or null.
    */
   function sizeRange(id, stuckKg) {
     const g = gear(id);
@@ -145,6 +145,14 @@
     return c > 1e-6 ? num(totalKg, 0) / (2 * c) : Infinity;
   }
 
+  /*
+   * The share of the strap's force on each shackle and recovery point at one
+   * end: all of it on a single point, each leg's share (rule leg-load) on a bridle.
+   */
+  function endShare(bridled, bridleDeg) {
+    return bridled ? legLoad(1, bridleDeg) : 1;
+  }
+
   root.ROPES_CALC = {
     kgToLb,
     lbToKg,
@@ -158,5 +166,6 @@
     sideLoadKeep,
     shackles,
     legLoad,
+    endShare,
   };
 })(window);

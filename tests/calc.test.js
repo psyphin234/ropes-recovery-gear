@@ -89,7 +89,7 @@
   });
 
   // ------------------------------------------------------------ sizing
-  test("SECURETECH sizing: 2:1 lowest noted, 4:1 recommended, on the stuck vehicle; none for winch rope", () => {
+  test("SECURETECH sizing: 2:1 lowest noted, 4:1 recommended, on the stuck vehicle; none for a static pull strap", () => {
     const r = C.sizeRange("strap", 2900);
     eq(r.minKg, 5800, "2:1");
     eq(r.recKg, 11600, "4:1");
@@ -97,7 +97,7 @@
     eq(C.rangeVerdict(8000, r), "low", "8 t");
     eq(C.rangeVerdict(5000, r), "under", "5 t");
     eq(C.sizeRange("kinetic", 2000).recKg, 8000, "kinetic rope too");
-    eq(C.sizeRange("static", 2000), null, "winch rope");
+    eq(C.sizeRange("static", 2000), null, "static pull strap");
   });
 
   test("SECURETECH's suggested speed is in data", () => {
@@ -139,11 +139,11 @@
     eq(C.kinetic({ massKg: 3000, mbsKg: 8000, lengthM: 9, stretch: 0.2, speedKmh: v * 0.99 }).breaks, false, "just under holds");
   });
 
-  test("winch rope (static) peaks √(20% ÷ 3.2%) = 2.5 × a snatch strap", () => {
-    near(C.stretchOf("static"), 0.032, 1e-9, "Samson 0.96% at 30%");
+  test("static pull strap peaks √(20% ÷ 5%) = 2 × a snatch strap", () => {
+    near(C.stretchOf("static"), 0.05, 1e-9, "SECURETECH's 5% low-elongation webbing");
     const s = C.kinetic({ massKg: 3000, mbsKg: 8000, lengthM: 9, stretch: C.stretchOf("strap"), speedKmh: 8 });
     const w = C.kinetic({ massKg: 3000, mbsKg: 8000, lengthM: 9, stretch: C.stretchOf("static"), speedKmh: 8 });
-    near(w.peakIfUnbrokenKg / s.peakIfUnbrokenKg, 2.5, 1e-9, "ratio");
+    near(w.peakIfUnbrokenKg / s.peakIfUnbrokenKg, 2, 1e-9, "ratio");
   });
 
   test("kinetic: missing inputs give null", () => {
@@ -169,6 +169,13 @@
     const f = s.find((x) => x.id === "f55-3/8");
     near(f.wllKg, C.lbToKg(8700), 1e-9, "soft WLL");
     eq(f.sideUnknown, true, "flagged: no side-load figure");
+  });
+
+  test("each end's share: all of it on one point, each leg's share on a bridle", () => {
+    eq(C.endShare(false, 60), 1, "one point");
+    near(C.endShare(true, 0), 0.5, 1e-9, "bridle, legs side by side");
+    near(C.endShare(true, 60), 1 / (2 * Math.cos(Math.PI / 6)), 1e-9, "bridle, 60°");
+    near(C.endShare(true, 120), 1, 1e-9, "bridle, 120°");
   });
 
   test("leg load: half side by side, 71% at 90°, all of it at 120°", () => {

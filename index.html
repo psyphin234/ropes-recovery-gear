@@ -135,7 +135,18 @@
 
       <!-- 4. Shackles -->
       <div class="part" id="shackle-part">
-        <p class="part-label">Shackles, steel and soft</p>
+        <p class="part-label">Each end: shackles and bridles</p>
+        <div class="end-tabs" id="end-tabs" role="radiogroup" aria-label="Which end you're setting up"></div>
+        <div class="hookup">
+          <div class="chips chips--small" id="hook-chips" role="radiogroup" aria-label="Hooked to"></div>
+          <div class="hook-bridle" id="hook-bridle">
+            <div class="chips chips--small" id="hook-bridle-chips" role="radiogroup" aria-label="Bridle"></div>
+            <div class="slider">
+              <input type="range" id="hookBridleDeg" min="0" max="150" step="5" aria-label="Angle between the bridle's legs">
+              <output id="hook-bridle-out" for="hookBridleDeg"></output>
+            </div>
+          </div>
+        </div>
         <div class="shackle-top">
           <div class="ctl ctl--side">
             <span class="ctl-label" id="side-label">Pull on the shackle <small>off in-line</small></span>
@@ -150,7 +161,7 @@
             <span class="mini-field"><input id="pointKg" type="number" inputmode="numeric" min="0" step="100" placeholder="–"><span>kg</span></span>
           </div>
         </div>
-        <ul class="shackles" id="shackles" role="radiogroup" aria-label="Shackle used"></ul>
+        <ul class="shackles" id="shackles" role="radiogroup" aria-label="Shackle at this end"></ul>
         <div id="shackle-notes"></div>
       </div>
 

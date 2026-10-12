@@ -43,18 +43,6 @@
       country: "US",
       kind: "maker",
     },
-    samsonAmsteel: {
-      label: "Samson Rope, AmSteel-Blue (12-strand Dyneema SK78) specifications",
-      url: "https://www.samsonrope.com/amsteel--blue",
-      country: "US",
-      kind: "maker",
-    },
-    samsonWarning: {
-      label: "Samson Rope, Warning statement (working loads, shock loading, recoil)",
-      url: "https://www.samsonrope.com/warning-statement",
-      country: "US",
-      kind: "maker",
-    },
     crosby: {
       label: "Crosby (Kito Crosby), G-209 / S-209 Screw Pin Anchor Shackles",
       url: "https://kitocrosby.com/product/crosby-g-209-s-209-screw-pin-anchor-shackles/",
@@ -121,6 +109,12 @@
       country: "ZA",
       kind: "maker",
     },
+    stPull: {
+      label: "SECURETECH, Winch Extension/Pull Strap",
+      url: "https://securetech.co.za/product/winch-extension-pull-strap/",
+      country: "ZA",
+      kind: "maker",
+    },
     stLanyard: {
       label: "SECURETECH, Recovery Safety Lanyard",
       url: "https://securetech.co.za/product/recovery-safety-lanyard/",
@@ -164,12 +158,12 @@
    * stretch at the strap's breaking strength used by the spring model.
    *   strap:   SECURETECH 20-25% (handbook) / 20-30% (website), taken at 20% (the low end gives the higher force)
    *   kinetic: SECURETECH 30-40%, taken at 30% (likewise)
-   *   static:  Samson AmSteel-Blue, 0.96% at 30% of break, carried on in a straight line
+   *   static:  a static pull strap: SECURETECH's 5% for its low-elongation polyester webbing
    */
   const gearTypes = [
     { id: "strap", label: "Snatch strap", short: "Strap", stretchRule: "strap-stretch", sizeRule: "securetech-sizing", series: "s1" },
     { id: "kinetic", label: "Kinetic rope", short: "Kinetic rope", stretchRule: "kinetic-stretch", sizeRule: "securetech-sizing", series: "s3" },
-    { id: "static", label: "Winch rope (static)", short: "Winch rope", stretchRule: "static-stretch", sizeRule: null, series: "s4" },
+    { id: "static", label: "Static pull strap", short: "Pull strap", stretchRule: "static-stretch", sizeRule: null, series: "s4" },
   ];
 
   // SECURETECH rated alloy recovery bow shackles (US Fed Spec RR-C-271b, factor
@@ -284,11 +278,11 @@
     {
       id: "static-stretch",
       category: "maker",
-      title: "How little a winch rope stretches",
-      summary: "Samson lists AmSteel-Blue (a 12-strand Dyneema winch rope) stretching 0.46% at 10% of its breaking strength, 0.70% at 20% and 0.96% at 30%. Carried on in a straight line from the 30% figure, that's about 3.2% at break: a tenth of a kinetic rope's stretch. Samson gives no figure past 30%. This page uses it to show why a winch rope isn't for snatching; Samson also warns that working loads don't apply once a rope has been shock loaded.",
-      quote: "Elastic Elongation: 10% 0.46% · 20% 0.70% · 30% 0.96% … Working loads, as described herein, are not applicable when rope has been subjected to shock loading.",
-      sources: ["samsonAmsteel", "samsonWarning"],
-      params: { atFraction: 0.3, elongation: 0.0096, stretch: 0.0096 / 0.3 },
+      title: "How little a static pull strap stretches",
+      summary: "SECURETECH's pull strap is low-elongation polyester webbing, for lightly stuck vehicles: the first option in a recovery, and it can extend a winch cable. SECURETECH gives no stretch figure for it; for its lanyard, bridle and tree protector, made of low-elongation polyester webbing too, it gives 5%. The page uses that 5%: a quarter of a snatch strap's stretch, which is why a pull strap isn't for snatching.",
+      quote: "This is used for recovery of lightly stuck vehicles and forms ones' first line of defense (first option) in a recovery situation. … Made from low elongation polyester webbing with folded eyes in single and double layer configurations. [Safety lanyard:] It is made of low elongation (5%) high tenacity polyester webbing",
+      sources: ["stPull", "stHandbook", "stLanyard"],
+      params: { stretch: 0.05 },
       checked: "2026-10-12",
     },
     {
@@ -459,6 +453,7 @@
   // Things nobody citable publishes: shown as "no published figure", never guessed.
   const gaps = [
     { id: "speed", title: "Speed for vehicles of different mass", text: "SECURETECH suggests 18 km/h for two vehicles of similar mass; we found no figure for vehicles of different mass. The page shows how the force grows with speed." },
+    { id: "pull-stretch", title: "How much a pull strap stretches", text: "SECURETECH calls its pull strap low-elongation polyester webbing but gives no figure. The page uses the 5% SECURETECH gives for its lanyard, bridle and tree protector webbing." },
     { id: "wet", title: "How much weaker a wet strap is", text: "The standard says a soaked strap is weaker and stretches less, but nobody publishes how much." },
     { id: "lanyard", title: "A rating for safety lanyards", text: "SECURETECH publishes how to fit its lanyard (two loose ring hitch knots, 1.4 or 1.8 m long) but not its breaking strength, and nobody publishes how far a broken strap or flying shackle travels. The page shows the energy in the strap and SECURETECH's stand-off distance." },
     { id: "curve", title: "Each strap's stretch curve", text: "Makers give one stretch figure, not how stretch grows with load. The page assumes a straight line from no load to break." },
@@ -474,14 +469,14 @@
     { id: "st18", label: "SECURETECH's 18 km/h", values: { stuckKg: 2900, recKg: 2900, gear: "strap", mbsKg: 12000, lengthM: 9, speedKmh: 18, shackle: "bow-6.5" } },
     { id: "light", label: "Light SUV, heavy rescuer", values: { stuckKg: 1500, recKg: 3350, gear: "kinetic", mbsKg: 8000, lengthM: 9, speedKmh: 8, shackle: "f55-3/8" } },
     { id: "fast", label: "Too fast: 25 km/h", values: { stuckKg: 2900, recKg: 3100, gear: "strap", mbsKg: 12000, lengthM: 9, speedKmh: 25, shackle: "bow-4.75" } },
-    { id: "static", label: "Winch rope used to snatch", values: { stuckKg: 2900, recKg: 3100, gear: "static", mbsKg: 8000, lengthM: 9, speedKmh: 8, shackle: "bow-4.75" } },
+    { id: "static", label: "Pull strap used to snatch", values: { stuckKg: 2900, recKg: 3100, gear: "static", mbsKg: 8000, lengthM: 9, speedKmh: 8, shackle: "bow-4.75" } },
     { id: "overland", label: "Heavy overlander", values: { stuckKg: 4400, recKg: 3350, gear: "kinetic", mbsKg: 16000, lengthM: 9, speedKmh: 6, shackle: "f55-5/8" } },
   ];
 
   // The defaults the page opens with (also an example, labelled as such).
   const defaults = {
     stuckKg: 2900, recKg: 3100, gear: "strap", mbsKg: 12000, lengthM: 9, speedKmh: 10,
-    shackle: "bow-4.75", sideDeg: 0, pointKg: null,
+    shackleStuck: "bow-4.75", shackleRec: "bow-4.75", bridleStuck: false, bridleRec: false, endTab: "stuck", sideDeg: 0, pointKg: null,
     bridleDeg: 60, bridle: "st-b-16",
     treePullKg: 4310, treeDeg: 30, protector: "epic-4",
   };

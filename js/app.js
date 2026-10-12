@@ -16,8 +16,20 @@
   const STORE = "ropes-recovery-v1";
   const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  let S = Object.assign({}, D.defaults, load());
+  const saved = load();
+  let S = Object.assign({}, D.defaults, saved);
   if (!C.gear(S.gear)) S.gear = D.defaults.gear;
+  // before 2026-10-12 one shackle served both ends
+  if (saved.shackle && !saved.shackleStuck) {
+    S.shackleStuck = saved.shackle;
+    S.shackleRec = saved.shackle;
+  }
+  delete S.shackle;
+  // the two ends of the recovery: each has its own shackle, and a bridle or not
+  const ENDS = {
+    stuck: { shackle: "shackleStuck", bridle: "bridleStuck", name: "Stuck end", of: "the stuck end's", vehicle: "stuck vehicle" },
+    rec: { shackle: "shackleRec", bridle: "bridleRec", name: "Recovery end", of: "the recovery end's", vehicle: "recovery vehicle" },
+  };
   let R = null; // latest results
   let sceneView = null;
   let gaugeView = null;
@@ -64,19 +76,66 @@
     const range = C.sizeRange(S.gear, stuck);
     const fit = C.rangeVerdict(mbs, range);
     const all = C.shackles(numOr(S.sideDeg, 0));
-    const shackle = all.find((s) => s.id === S.shackle) || all.find((s) => s.id === D.defaults.shackle);
+    const findShackle = (id) => all.find((s) => s.id === id) || all.find((s) => s.id === D.defaults.shackleStuck);
     const pointKg = numOr(S.pointKg, 0) > 0 ? S.pointKg : null;
     const demand = kin.peakIfUnbrokenKg;
-    // what the peak must stay under (Bushranger: strap MBS, recovery point, shackle WLL)
-    const limits = [
-      { id: "mbs", label: `${gear.short} breaks at`, short: "Breaks", tiny: "Breaks", kg: mbs, cls: "lim-mbs" },
-      { id: "shackle", label: `${shackle.size} ${shackle.kind === "soft" ? "soft shackle" : "shackle"} WLL`, short: "Shackle WLL", tiny: "WLL", kg: shackle.wllKg, cls: "lim-shackle" },
-    ];
-    if (pointKg) limits.push({ id: "point", label: "Recovery points", short: "Points", tiny: "Points", kg: pointKg, cls: "lim-point" });
-    limits.forEach((l) => { l.speed = kin.speedFor(l.kg); l.ok = demand < l.kg; });
-    const weakest = limits.reduce((a, b) => (b.kg < a.kg ? b : a));
+    const bridle = D.bridles.find((x) => x.id === S.bridle) || D.bridles[0];
+    const bridleDeg = numOr(S.bridleDeg, 60);
+    const maxDeg = D.rule("shackle-included-angle").params.maxDeg;
+    // each end: its shackle, and on a bridle each shackle and point takes one leg's share (rule leg-load)
+    const ends = Object.keys(ENDS).map((side) => {
+      const E = ENDS[side];
+      const bridled = !!S[E.bridle];
+      return Object.assign({}, E, { side, bridled, share: C.endShare(bridled, bridleDeg), shackle: findShackle(S[E.shackle]), vehicleKg: side === "stuck" ? stuck : recv });
+    });
+    /*
+     * What the peak must stay under (SECURETECH: allow for the full load; Bushranger:
+     * never exceed the strap's MBS, the recovery points or the shackles' WLL).
+     * kg is the part's rating; share is how much of the strap's force it takes.
+     */
+    const limits = [{ id: "mbs", type: "mbs", label: `${gear.short} breaks at`, what: `the ${gear.short.toLowerCase()}'s breaking strength`, kg: mbs, share: 1 }];
+    ends.forEach((e) => {
+      const sh = `${e.shackle.size} ${e.shackle.kind === "soft" ? "soft shackle" : "shackle"}`;
+      limits.push({ id: "shackle-" + e.side, type: "shackle", side: e.side, label: e.bridled ? `${e.name}, bridle: each ${sh}'s WLL` : `${e.name}: ${sh} WLL`, what: `${e.of} ${e.shackle.kind === "soft" ? "soft shackle" : "shackle"} WLL`, kg: e.shackle.wllKg, share: e.share });
+      if (pointKg) limits.push({ id: "point-" + e.side, type: "point", side: e.side, label: e.bridled ? `${e.name}, bridle: each recovery point` : `${e.name}: recovery point`, what: `${e.of} recovery point rating`, kg: pointKg, share: e.share });
+      // SECURETECH gives one breaking strength for the bridle: checked against the whole pull
+      if (e.bridled) limits.push({ id: "bridle-" + e.side, type: "bridle", side: e.side, label: `${e.name}: bridle breaks at`, what: `${e.of} bridle's breaking strength`, kg: bridle.breakKg, share: 1 });
+    });
+    // the same part at both ends shows once
+    const merged = [];
+    limits.forEach((l) => {
+      const twin = l.side === "rec" && merged.find((m) => m.side === "stuck" && m.type === l.type && m.kg === l.kg && Math.abs(m.share - l.share) < 1e-9 && m.label.replace("Stuck end", "") === l.label.replace("Recovery end", ""));
+      if (!twin) return merged.push(l);
+      twin.side = "both";
+      twin.id = twin.type + "-both";
+      twin.label = twin.label.replace("Stuck end", "Both ends");
+      twin.what = twin.what.replace("the stuck end's", "both ends'");
+    });
+    const SHORT = { mbs: "Breaks", shackle: "Shackle WLL", point: "Point", bridle: "Bridle" };
+    const TINY = { mbs: "Breaks", shackle: "WLL", point: "Point", bridle: "Bridle" };
+    merged.forEach((l) => {
+      const tag = l.side === "stuck" ? " (stuck)" : l.side === "rec" ? " (rec.)" : "";
+      l.short = SHORT[l.type] + tag;
+      l.tiny = TINY[l.type] + tag;
+      l.cls = "lim-" + l.type;
+      l.loadKg = demand * l.share; // what the part carries at the peak
+      l.atKg = l.kg / l.share; // the strap force at which the part reaches its rating
+      l.speed = kin.speedFor(l.atKg);
+      l.ok = l.loadKg < l.kg;
+    });
+    const weakest = merged.reduce((a, b) => (b.atKg < a.atKg ? b : a));
     const keepUnder = Math.floor(weakest.speed);
-    return { stuck, recv, mbs, len, gear, stretch, speed, kin, range, fit, all, shackle, pointKg, demand, limits, weakest, keepUnder };
+    // bridle checks that aren't forces
+    const issues = [];
+    ends.filter((e) => e.bridled).forEach((e) => {
+      if (e.vehicleKg > bridle.maxVehicleKg) {
+        const bigger = D.bridles.find((b) => b.maxVehicleKg >= e.vehicleKg);
+        issues.push({ tone: "fail", head: `The bridle is too light for the ${e.vehicle}`, detail: `SECURETECH rates its ${bridle.label} bridle for vehicles up to ${U.kg(bridle.maxVehicleKg)}; the ${e.vehicle} is ${U.kg(e.vehicleKg)}.`, fix: bigger ? { text: `Use SECURETECH's ${bigger.label} bridle`, patch: { bridle: bigger.id } } : { text: "SECURETECH lists no bridle for a vehicle this heavy", patch: null } });
+      }
+      if (e.shackle.kind === "soft") issues.push({ tone: "warn", head: `Soft shackles on the ${e.side === "stuck" ? "stuck" : "recovery"} end's bridle`, detail: "SECURETECH fits its bridles to the vehicle with rated bow shackles." });
+    });
+    if (ends.some((e) => e.bridled) && bridleDeg > maxDeg) issues.push({ tone: "fail", head: `Bridle legs more than ${maxDeg}° apart`, detail: `Crosby: never put two legs more than ${maxDeg}° apart in one shackle's bow. At ${bridleDeg}° each leg takes ${Math.round(C.endShare(true, bridleDeg) * 100)}% of the pull. Use a longer bridle.`, fix: { text: `Bring the legs to ${maxDeg}°`, patch: { bridleDeg: maxDeg } } });
+    return { stuck, recv, mbs, len, gear, stretch, speed, kin, range, fit, all, ends, bridle, bridleDeg, pointKg, demand, limits: merged, weakest, keepUnder, issues };
   }
 
   // ------------------------------------------------------------ build once
@@ -85,7 +144,10 @@
       const b = el("button", { type: "button", class: "try-chip" }, sc.label);
       b.addEventListener("click", () => {
         stopPlay();
-        set(Object.assign({ sideDeg: 0, pointKg: null }, sc.values));
+        const v = Object.assign({}, sc.values);
+        const sh = v.shackle;
+        delete v.shackle;
+        set(Object.assign({ sideDeg: 0, pointKg: null, bridleStuck: false, bridleRec: false }, v, sh ? { shackleStuck: sh, shackleRec: sh } : {}));
         syncInputs();
         play.t = 0;
         if (!reduceMotion) startPlay();
@@ -126,6 +188,24 @@
       if (play.t === null || play.t >= 1 - 1e-6) play.t = 0;
       startPlay();
     });
+
+    Object.keys(ENDS).forEach((side) => {
+      const b = el("button", { type: "button", role: "radio", class: "end-tab", "data-end": side, "aria-checked": "false" },
+        el("span", { class: "end-tab-name" }, ENDS[side].name), el("small", { class: "end-tab-sub" }));
+      b.addEventListener("click", () => set({ endTab: side }));
+      $("end-tabs").appendChild(b);
+    });
+    [{ id: "point", label: "One recovery point", bridled: false }, { id: "bridle", label: "Bridle across two points", bridled: true }].forEach((o) => {
+      const b = el("button", { type: "button", role: "radio", class: "chip", "data-hook": o.id, "aria-checked": "false" }, o.label);
+      b.addEventListener("click", () => set({ [ENDS[endTab()].bridle]: o.bridled }));
+      $("hook-chips").appendChild(b);
+    });
+    D.bridles.forEach((p) => {
+      const b = el("button", { type: "button", role: "radio", class: "chip", "data-bridle": p.id, "aria-checked": "false" }, `SECURETECH ${p.label}`);
+      b.addEventListener("click", () => set({ bridle: p.id }));
+      $("hook-bridle-chips").appendChild(b);
+    });
+    $("hookBridleDeg").addEventListener("input", (e) => set({ bridleDeg: +e.target.value }));
 
     shackleView = V.shackleView();
     $("side-view").appendChild(shackleView.el);
@@ -170,6 +250,8 @@
     if (fields.parentNode !== home) home.appendChild(fields);
   }
 
+  const endTab = () => (ENDS[S.endTab] ? S.endTab : "stuck");
+
   function syncInputs() {
     $("stuckKg").value = S.stuckKg || "";
     $("recKg").value = S.recKg || "";
@@ -181,6 +263,7 @@
     $("treePullKg").value = S.treePullKg || "";
     $("treeDeg").value = numOr(S.treeDeg, 30);
     $("bridleDeg").value = numOr(S.bridleDeg, 60);
+    $("hookBridleDeg").value = numOr(S.bridleDeg, 60);
   }
 
   // ------------------------------------------------------------ update
@@ -188,7 +271,24 @@
     R = compute();
     document.querySelectorAll("#gear-chips .chip").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.gear === S.gear)));
     document.querySelectorAll("#protector-chips .chip").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.protector === S.protector)));
-    document.querySelectorAll("#bridle-chips .chip").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.bridle === S.bridle)));
+    document.querySelectorAll("#bridle-chips .chip, #hook-bridle-chips .chip").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.bridle === S.bridle)));
+    const tab = endTab();
+    const tabBridled = !!S[ENDS[tab].bridle];
+    document.querySelectorAll("#hook-chips .chip").forEach((b) => b.setAttribute("aria-checked", String((b.dataset.hook === "bridle") === tabBridled)));
+    $("hook-bridle").hidden = !tabBridled;
+    const bDeg = numOr(S.bridleDeg, 60);
+    // the bridle angle has two sliders (here and under Bridle): keep them together
+    $("bridleDeg").value = bDeg;
+    $("hookBridleDeg").value = bDeg;
+    $("hook-bridle-out").textContent = `${bDeg}° between the legs`;
+    document.querySelectorAll("#end-tabs .end-tab").forEach((b) => {
+      const E = ENDS[b.dataset.end];
+      b.setAttribute("aria-checked", String(b.dataset.end === tab));
+      const soft = D.softShackles.find((x) => x.id === S[E.shackle]);
+      const steel = D.steelShackles.find((x) => x.id === S[E.shackle]);
+      const size = (soft || steel || D.steelShackles.find((x) => x.id === D.defaults.shackleStuck)).size;
+      b.querySelector(".end-tab-sub").textContent = S[E.bridle] ? `Bridle, 2 × ${size}${soft ? " soft" : ""} shackles` : `${size} ${soft ? "soft shackle" : "shackle"}`;
+    });
     const sp = Math.max(1, numOr(S.speedKmh, 10));
     $("speed-out").textContent = `${sp} km/h`;
     const gear = C.gear(S.gear);
@@ -239,18 +339,27 @@
     let detail;
     let fix = null;
     const over = limits.filter((l) => !l.ok);
+    const failIssue = R.issues.find((i) => i.tone === "fail");
+    const warnIssues = R.issues.filter((i) => i.tone === "warn");
+    const partName = { shackle: "shackle", point: "recovery point", bridle: "bridle" };
     if (S.gear === "static") {
       tone = "fail";
-      head = "A winch rope isn't for snatching";
-      detail = `It hardly stretches, so the same snatch hits ${Math.round((demand / C.kinetic({ massKg: R.recv, mbsKg: R.mbs, lengthM: R.len, stretch: C.stretchOf("kinetic"), speedKmh: speed }).peakIfUnbrokenKg) * 100 - 100)}% harder than with a kinetic rope of the same strength: ${t1(demand)} at ${speed} km/h. Samson: working loads don't apply once a rope has been shock loaded.`;
+      head = "A static pull strap isn't for snatching";
+      detail = `It hardly stretches, so the same snatch hits ${Math.round((demand / C.kinetic({ massKg: R.recv, mbsKg: R.mbs, lengthM: R.len, stretch: C.stretchOf("kinetic"), speedKmh: speed }).peakIfUnbrokenKg) * 100 - 100)}% harder than with a kinetic rope of the same strength: ${t1(demand)} at ${speed} km/h. SECURETECH: a pull strap is for a steady pull on a lightly stuck vehicle, the first option; kinetic straps and ropes are the last.`;
       fix = { text: "Use a kinetic rope instead", patch: { gear: "kinetic" } };
     } else if (over.length) {
       tone = "fail";
-      const names = over.map((l) => (l.id === "mbs" ? `the ${gear.short.toLowerCase()}'s ${t1(l.kg)} breaking strength` : l.id === "shackle" ? `the shackle's ${t1(l.kg)} WLL` : `the recovery points' ${t1(l.kg)}`));
-      head = over.some((l) => l.id === "mbs") ? `It could break at ${speed} km/h` : `Too much for the ${over[0].id === "shackle" ? "shackle" : "recovery points"} at ${speed} km/h`;
-      detail = `The snatch would reach ${t1(demand)} if nothing gave: over ${names.join(" and ")}.`;
+      const names = over.map((l) => `${l.what} of ${t1(l.kg)}${l.share !== 1 ? ` (each takes ${t1(l.loadKg)})` : ""}`);
+      const parts = [...new Set(over.filter((l) => l.type !== "mbs").map((l) => partName[l.type]))];
+      head = over.some((l) => l.type === "mbs") ? `It could break at ${speed} km/h` : `Too much for the ${parts.join(" and ")} at ${speed} km/h`;
+      detail = `The snatch would reach ${t1(demand)} in the ${gear.short.toLowerCase()} if nothing gave: over ${names.join(" and ")}.`;
       if (keepUnder >= 1) fix = { text: `Keep under ${keepUnder} km/h`, patch: { speedKmh: keepUnder } };
-      else fix = { text: "Even 1 km/h is too much with this gear: use a stronger strap, shackle or recovery point", patch: null };
+      else fix = { text: "Even 1 km/h is too much with this gear: use a stronger strap, shackle, bridle or recovery point", patch: null };
+    } else if (failIssue) {
+      tone = "fail";
+      head = failIssue.head;
+      detail = failIssue.detail;
+      fix = failIssue.fix || null;
     } else if (fit === "under") {
       tone = "fail";
       head = `Too light for the ${t1(R.stuck)} stuck vehicle`;
@@ -259,26 +368,31 @@
     } else {
       tone = fit === "low" ? "warn" : "pass";
       head = fit === "low" ? `Holds at ${speed} km/h, but under SECURETECH's recommended 4:1` : `Holds at ${speed} km/h`;
-      detail = `The snatch can reach ${t1(demand)}: ${Math.round((demand / weakest.kg) * 100)}% of the ${weakest.id === "mbs" ? `${gear.short.toLowerCase()}'s breaking strength` : weakest.id === "shackle" ? "shackle's WLL" : "recovery points' rating"}, the weakest part. Above ${keepUnder} km/h it wouldn't.`;
+      detail = `The snatch can reach ${t1(demand)}${weakest.share !== 1 ? `, ${t1(weakest.loadKg)} on each of the bridle's legs` : ""}: ${Math.round((weakest.loadKg / weakest.kg) * 100)}% of ${weakest.what}, the weakest part. Above ${keepUnder} km/h it wouldn't.`;
       if (fit === "low") {
         detail += ` SECURETECH recommends 4 × the stuck vehicle's ${t1(R.stuck)}: ${t1(range.recKg)}.`;
         fix = { text: `Use a ${t1(Math.ceil(range.recKg / 1000) * 1000)} ${gear.short.toLowerCase()}`, patch: { mbsKg: Math.ceil(range.recKg / 1000) * 1000 } };
       }
+      if (warnIssues.length) {
+        tone = "warn";
+        detail += " " + warnIssues.map((i) => `${i.head}: ${i.detail}`).join(" ");
+      }
     }
 
-    const max = Math.max(demand, ...limits.map((l) => l.kg)) * 1.04;
+    // each part's own load against its own rating; on a bridle a leg's shackle and point take less than the peak
+    const max = Math.max(demand, ...limits.map((l) => Math.max(l.kg, l.loadKg))) * 1.04;
     const pc = (kg) => (Math.min(kg, max) / max) * 100;
     const rows = [
       el("div", { class: "bal-row" }, el("span", { class: "bal-name" }, `Peak force at ${speed} km/h`),
         el("div", { class: "bal-bar" }, el("span", { class: "bal-seg seg-2", style: `width:${pc(demand)}%` })),
         el("strong", { class: "bal-val" }, t1(demand))),
-    ].concat(limits.map((l) => el("div", { class: "bal-row" }, el("span", { class: "bal-name" }, l.label),
+    ].concat(limits.map((l) => el("div", { class: "bal-row" }, el("span", { class: "bal-name" }, l.label, l.share !== 1 ? el("small", null, ` takes ${t1(l.loadKg)}, ${Math.round(l.share * 100)}% of the peak`) : null),
       el("div", { class: "bal-bar" }, el("span", { class: "bal-seg bal-limit " + l.cls + (l.ok ? "" : " is-over"), style: `width:${pc(l.kg)}%` }),
-        el("span", { class: "bal-tick", style: `left:${pc(demand)}%`, title: `Peak force ${t1(demand)}` })),
+        el("span", { class: "bal-tick", style: `left:${pc(l.loadKg)}%`, title: `Load on it ${t1(l.loadKg)}` })),
       el("strong", { class: "bal-val" }, el("span", { class: "bal-ok tone-" + (l.ok ? "pass" : "fail") }, U.statusIcon(l.ok ? "pass" : "fail")), t1(l.kg)))));
 
     const sub = el("p", { class: "verdict-sub" },
-      `The ${t1(R.recv)} recovery vehicle at ${speed} km/h carries ${U.n(kin.energyJ / 1000, 0.1)} kJ; the ${gear.short.toLowerCase()} (${U.n(R.len, 0.1)} m, ${Math.round(R.stretch * 1000) / 10}% stretch at break) soaks it up as stretch and gives it back as pull. Worked out with the stuck vehicle held still, the hardest case: a calculation, not a measurement, so a real snatch peaks lower. SECURETECH suggests 18 km/h for two vehicles of similar mass. The line on each bar is the peak force.`,
+      `The ${t1(R.recv)} recovery vehicle at ${speed} km/h carries ${U.n(kin.energyJ / 1000, 0.1)} kJ; the ${gear.short.toLowerCase()} (${U.n(R.len, 0.1)} m, ${Math.round(R.stretch * 1000) / 10}% stretch at break) soaks it up as stretch and gives it back as pull. Worked out with the stuck vehicle held still, the hardest case: a calculation, not a measurement, so a real snatch peaks lower. SECURETECH suggests 18 km/h for two vehicles of similar mass. The line on each bar is the load on that part at the peak.`,
       el("strong", { class: "verdict-warn" }, " For information only: whatever this says, judge the recovery on the scene."));
 
     let fixEl = null;
@@ -300,22 +414,23 @@
   // ------------------------------------------------------------ the snatch, moment by moment
   function renderPlay() {
     const { kin, limits, demand } = R;
-    gaugeView.setScale(Math.max(demand, ...limits.map((l) => l.kg)), limits, kin.peakKg);
-    $("gauge-legend").replaceChildren(...limits.map((l) => el("li", null, el("span", { class: "gl-key " + l.cls, "aria-hidden": "true" }), `${l.label} ${t1(l.kg)}`)));
+    // marks in strap force: where each part reaches its rating (on a bridle, more than its own rating)
+    gaugeView.setScale(Math.max(demand, ...limits.map((l) => l.atKg)), limits.map((l) => ({ kg: l.atKg, cls: l.cls })), kin.peakKg);
+    $("gauge-legend").replaceChildren(...limits.map((l) => el("li", null, el("span", { class: "gl-key " + l.cls, "aria-hidden": "true" }), `${l.label} ${t1(l.kg)}${l.share !== 1 ? `: reached at ${t1(l.atKg)} in the ${R.gear.short.toLowerCase()}` : ""}`)));
     const pts = kin.points.map((p) => {
       const q = { x: p.t, forceKg: p.forceKg };
-      limits.forEach((l) => { q[l.id] = l.kg; });
+      limits.forEach((l) => { q[l.id] = l.atKg; });
       return Object.assign(q, { stretchM: p.stretchM, speedKmh: p.speedKmh, energyJ: p.energyJ });
     });
     const w = $("chart-snatch").clientWidth || 600;
     snatchChart = V.lineChart({
       width: w, height: 210, points: pts, yUnit: "t", yFormat: (v) => U.n(v / 1000, v % 1000 ? 0.1 : 1), xLabel: "Seconds after it goes tight", labelEnds: true,
-      series: [{ key: "forceKg", cls: "ch-line--force", label: "Force in strap", short: "Force" }].concat(limits.map((l) => ({ key: l.id, cls: "ch-line--" + l.id, label: l.short, short: l.tiny, flat: true }))),
+      series: [{ key: "forceKg", cls: "ch-line--force", label: "Force in strap", short: "Force" }].concat(limits.map((l) => ({ key: l.id, cls: "ch-line--" + l.type, label: l.short, short: l.tiny, flat: true }))),
       tip: (p) => [`${U.n(p.x, 0.01)} s after it goes tight`, `Force ${t1(p.forceKg)}`, `Stretched ${U.n(p.stretchM, 0.01)} m`, `Recovery vehicle ${U.n(Math.max(p.speedKmh, 0), 0.1)} km/h${p.speedKmh < -0.05 ? " backwards" : ""}`],
-      aria: "Force in the strap over time, from the moment it goes tight, against the strap's breaking strength and the shackle's WLL",
+      aria: "Force in the strap over time, from the moment it goes tight, against the force at which the strap, each end's shackles and any bridle or recovery points reach their ratings",
     });
     $("chart-snatch").replaceChildren(
-      el("p", { class: "chart-title" }, el("span", { class: "key key--force" }), "Force in the strap", ...limits.map((l) => [el("span", { class: "key key--" + l.id }), l.short])),
+      el("p", { class: "chart-title" }, el("span", { class: "key key--force" }), "Force in the strap", ...limits.map((l) => [el("span", { class: "key key--" + l.type }), l.short])),
       snatchChart.el);
     $("play-slow").textContent = `The real snatch takes ${U.n(kin.tEnd, 0.01)} s; played ${Math.round((DUR * (1 - LEAD)) / 1000 / kin.tEnd)}× slower.`;
 
@@ -455,14 +570,14 @@
       width: w, height: 230, points: pts, yUnit: "t", yFormat: (v) => U.n(v / 1000, v % 1000 ? 0.1 : 1), xLabel: "Speed when it goes tight (km/h)", labelEnds: true,
       series: kinds.map((x) => ({ key: x.g.id, cls: "ch-line--" + x.g.id, label: x.g.short, short: x.g.short.replace("Kinetic rope", "Kinetic") })).concat([{ key: "mbs", cls: "ch-line--mbs", label: `Breaks (${t1(mbs)})`, short: "Breaks", flat: true }]),
       tip: (p) => [`${U.n(p.x, 0.5)} km/h`].concat(kinds.map((x) => `${x.g.short}: ${t1(p[x.g.id])}${p[x.g.id] >= mbs ? " (breaks)" : ""}`)),
-      aria: "Peak force against speed for a snatch strap, a kinetic rope and a winch rope of the same strength and length",
+      aria: "Peak force against speed for a snatch strap, a kinetic rope and a static pull strap of the same strength and length",
     });
     speedChart.setPlayhead(speed);
     const rows = kinds.map((x) => el("tr", { class: x.g.id === S.gear ? "is-mine" : null },
       el("th", { scope: "row" }, el("span", { class: "key key--" + x.g.id }), x.g.short),
       el("td", { class: "num" }, `${Math.round(x.k ? C.stretchOf(x.g.id) * 1000 : 0) / 10}%`),
       el("td", { class: "num" }, t1(x.k.peakIfUnbrokenKg * speed)),
-      el("td", { class: "num" }, `${Math.floor(x.k.speedFor(Math.min(...limits.map((l) => l.kg))))} km/h`)));
+      el("td", { class: "num" }, `${Math.floor(x.k.speedFor(Math.min(...limits.map((l) => l.atKg))))} km/h`)));
 
     $("sizes").replaceChildren(
       el("p", { class: "hint part-intro" }, "SECURETECH: buy straps and ropes relative to the vehicle's weight, rated by the mass of the stuck vehicle. Its noted factors of safety are 2:1, 3:1 and 4:1, and it recommends 4:1."),
@@ -473,29 +588,36 @@
       el("div", { class: "table-wrap" }, el("table", { class: "limit-table speed-table" },
         el("thead", null, el("tr", null, el("th", { scope: "col" }, "Kind"), el("th", { scope: "col", class: "num" }, "Stretch"), el("th", { scope: "col", class: "num" }, `Peak, ${speed} km/h`), el("th", { scope: "col", class: "num" }, "Keep under"))),
         el("tbody", null, rows))),
-      el("p", { class: "hint" }, `Stretch is what makes a kinetic recovery gentle: the more a strap or rope stretches, the longer it takes to stop the recovery vehicle, and the lower the peak. A winch rope (Dyneema, about 3% stretch at break) peaks ${U.n(Math.sqrt(C.stretchOf("strap") / C.stretchOf("static")), 0.1)} times as hard as a snatch strap of the same strength. "Keep under" is the speed at which the peak reaches the weakest of the strap, the shackle${R.pointKg ? " and the recovery points" : ""}. Stretch figures: SECURETECH's 20–25% for straps and 30–40% for ropes, taken at the low end (the higher force), and Samson's AmSteel-Blue for the winch rope; yours may differ. SECURETECH: kinetic straps and ropes must never anchor a winch or extend a winch cable.`),
+      el("p", { class: "hint" }, `Stretch is what makes a kinetic recovery gentle: the more a strap or rope stretches, the longer it takes to stop the recovery vehicle, and the lower the peak. A static pull strap (low-elongation polyester, about 5%) peaks ${U.n(Math.sqrt(C.stretchOf("strap") / C.stretchOf("static")), 0.1)} times as hard as a snatch strap of the same strength. "Keep under" is the speed at which the peak reaches the weakest part: ${["the strap", "either end's shackles"].concat(R.ends.some((e) => e.bridled) ? ["the bridle"] : [], R.pointKg ? ["the recovery points"] : []).join(", ").replace(/, ([^,]*)$/, " or $1")}. Stretch figures: SECURETECH's 20–25% for straps and 30–40% for ropes, taken at the low end (the higher force), and the 5% SECURETECH gives for its low-elongation polyester webbing for the pull strap (it publishes no pull strap figure); yours may differ. SECURETECH: kinetic straps and ropes must never anchor a winch or extend a winch cable.`),
       U.sourcesLine(["securetech-sizing", "strap-stretch", "kinetic-stretch", "snatch-speed", "static-stretch", "kinetic-model"]));
   }
 
   // ------------------------------------------------------------ shackles
   function renderShackles() {
-    const { all, demand, shackle } = R;
+    const { all, demand, ends } = R;
     const sd = numOr(S.sideDeg, 0);
     const keep = C.sideLoadKeep(sd);
+    const end = ends.find((e) => e.side === endTab());
+    const load = demand * end.share; // on each shackle at this end
     $("shackles").replaceChildren(...all.map((s) => {
-      const ok = s.wllKg > demand;
-      const b = el("button", { type: "button", role: "radio", class: "sk" + (ok ? " sk--pass" : " sk--fail"), "aria-checked": String(s.id === shackle.id) },
+      const ok = s.wllKg > load;
+      const usedAt = ends.filter((e) => e.shackle.id === s.id).map((e) => (e.side === "stuck" ? "Stuck end" : "Recovery end"));
+      const b = el("button", { type: "button", role: "radio", class: "sk" + (ok ? " sk--pass" : " sk--fail"), "aria-checked": String(s.id === end.shackle.id) },
+        usedAt.length ? el("span", { class: "sk-used" }, usedAt.join(" · ")) : null,
         el("span", { class: "sk-kind" }, s.kind === "soft" ? "Soft · Factor 55" : "SECURETECH bow"),
         el("strong", { class: "sk-name" }, s.size),
         el("span", { class: "sk-wll" }, U.statusIcon(ok ? "pass" : "fail"), `WLL ${t1(s.wllKg)}`),
         el("small", { class: "sk-sub" }, s.kind === "steel"
           ? (keep < 1 ? `${Math.round(keep * 100)}% of ${t1(s.ratedWllKg)} at ${sd}°` : `breaks at ${t1(s.breakKg)} or more (6:1)`)
           : (s.sideUnknown ? "no side-load figure" : `breaks at ${t1(s.breakKg)}`)));
-      b.addEventListener("click", () => set({ shackle: s.id }));
+      b.addEventListener("click", () => set({ [ENDS[end.side].shackle]: s.id }));
       return el("li", null, b);
     }));
+    const loadText = end.bridled
+      ? `the ${t1(load)} each takes at ${R.speed} km/h: on the bridle, legs ${R.bridleDeg}° apart, each leg's shackle takes ${Math.round(end.share * 100)}% of the ${t1(demand)} peak (the wider the legs, the more each takes)`
+      : `the ${t1(demand)} peak force at ${R.speed} km/h`;
     $("shackle-notes").replaceChildren(
-      el("p", { class: "hint" }, `Green: the WLL is above the ${t1(demand)} peak force at ${R.speed} km/h, so it passes Bushranger's rule (never exceed the shackles' WLL). The one you pick goes into the check above.${sd > 10 ? ` Pulled ${sd}° off in-line, Crosby's chart leaves a screw pin shackle ${Math.round(keep * 100)}% of its WLL; we found no such figure for soft shackles.` : ""}`),
+      el("p", { class: "hint" }, `Pick an end above, then its shackle here. Green: the WLL is above ${loadText}. That allows for the full load (SECURETECH; Bushranger: never exceed the shackles' WLL). Both ends go into the check above.${sd > 10 ? ` Pulled ${sd}° off in-line (this applies to every shackle), Crosby's chart leaves a screw pin shackle ${Math.round(keep * 100)}% of its WLL; we found no such figure for soft shackles.` : ""}`),
       el("ul", { class: "rules-list" },
         el("li", null, el("strong", null, "Rated bow shackles only: "), "SECURETECH: never commercial or D shackles (a commercial one has a pin as thin as its body and no markings); at least 2 t WLL, and 2 to 6.5 t covers most recoveries. Tighten the pin, then back it off half a turn."),
         el("li", null, el("strong", null, "Side pulls: "), "a rated bow shackle can take one, but at 90° its rating halves (SECURETECH). Several eyes go on the bow, not the pin; shackle to shackle is bow to bow or bow to pin, never pin to pin."),
@@ -571,6 +693,9 @@
         U.figure(`SECURETECH ${b.label}`, `breaks at ${t1(b.breakKg)}`, `${U.n(times, 0.1)} × each leg's load · for vehicles up to ${U.n(b.maxVehicleKg, 1)} kg`, massOk ? "figure--pass" : "figure--fail")),
       massOk ? null : el("p", { class: "warn-line tone-fail" }, U.statusIcon("fail"), `SECURETECH rates this bridle for vehicles up to ${U.n(b.maxVehicleKg, 1)} kg; the heavier vehicle here is ${U.kg(heavier)}.`),
       over ? el("p", { class: "warn-line tone-fail" }, U.statusIcon("fail"), `Over ${maxDeg}°: Crosby says never put two legs that far apart in one shackle. Use a longer bridle.`) : null,
+      el("p", { class: "hint" }, R.ends.some((e) => e.bridled)
+        ? `In the check above at the ${R.ends.filter((e) => e.bridled).map((e) => e.name.toLowerCase()).join(" and the ")}: the same bridle and angle.`
+        : "Not in the check above: choose \"Bridle across two points\" for either end under Each end: shackles and bridles."),
       el("ul", { class: "rules-list" },
         el("li", null, el("strong", null, "Its job: "), "to balance the pull across two recovery points and ease the stress on each (SECURETECH)."),
         el("li", null, el("strong", null, "Fitted right: "), "at least 3.5 m long, on rated bow shackles, with two lanyards as well (SECURETECH)."),
