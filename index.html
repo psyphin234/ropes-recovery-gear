@@ -104,6 +104,38 @@
         </div>
       </div>
 
+      <!-- Each end: its shackle, and a bridle or not. Inputs, so they sit with the others above the verdict -->
+      <div class="ends" id="ends-part">
+        <p class="ends-label">Each end: shackles and bridles</p>
+        <div class="end-tabs" id="end-tabs" role="radiogroup" aria-label="Which end you're setting up"></div>
+        <div class="hookup">
+          <div class="chips chips--small" id="hook-chips" role="radiogroup" aria-label="Hooked to"></div>
+          <div class="hook-bridle" id="hook-bridle">
+            <div class="chips chips--small" id="hook-bridle-chips" role="radiogroup" aria-label="Bridle"></div>
+            <div class="slider">
+              <input type="range" id="hookBridleDeg" min="0" max="150" step="5" aria-label="Angle between the bridle's legs">
+              <output id="hook-bridle-out" for="hookBridleDeg"></output>
+            </div>
+          </div>
+        </div>
+        <div class="shackle-top">
+          <div class="ctl ctl--side">
+            <span class="ctl-label" id="side-label">Pull on the shackle <small>off in-line</small></span>
+            <div class="slider slider--pic">
+              <span id="side-view"></span>
+              <input type="range" id="sideDeg" min="0" max="90" step="1" aria-labelledby="side-label">
+              <output id="side-out" for="sideDeg"></output>
+            </div>
+          </div>
+          <div class="ctl ctl--point">
+            <label class="ctl-label" for="pointKg">Recovery points rated <small>if you know it</small></label>
+            <span class="mini-field"><input id="pointKg" type="number" inputmode="numeric" min="0" step="100" placeholder="–"><span>kg</span></span>
+          </div>
+        </div>
+        <ul class="shackles" id="shackles" role="radiogroup" aria-label="Shackle at this end"></ul>
+        <p class="hint" id="shackle-hint"></p>
+      </div>
+
       <div class="verdict" id="verdict" role="status" aria-live="polite"></div>
 
       <!-- 2. The snatch, moment by moment -->
@@ -133,35 +165,9 @@
         <div id="sizes"></div>
       </div>
 
-      <!-- 4. Shackles -->
+      <!-- 4. Shackles: the rules (the shackle pickers sit with the other inputs, above the verdict) -->
       <div class="part" id="shackle-part">
-        <p class="part-label">Each end: shackles and bridles</p>
-        <div class="end-tabs" id="end-tabs" role="radiogroup" aria-label="Which end you're setting up"></div>
-        <div class="hookup">
-          <div class="chips chips--small" id="hook-chips" role="radiogroup" aria-label="Hooked to"></div>
-          <div class="hook-bridle" id="hook-bridle">
-            <div class="chips chips--small" id="hook-bridle-chips" role="radiogroup" aria-label="Bridle"></div>
-            <div class="slider">
-              <input type="range" id="hookBridleDeg" min="0" max="150" step="5" aria-label="Angle between the bridle's legs">
-              <output id="hook-bridle-out" for="hookBridleDeg"></output>
-            </div>
-          </div>
-        </div>
-        <div class="shackle-top">
-          <div class="ctl ctl--side">
-            <span class="ctl-label" id="side-label">Pull on the shackle <small>off in-line</small></span>
-            <div class="slider slider--pic">
-              <span id="side-view"></span>
-              <input type="range" id="sideDeg" min="0" max="90" step="1" aria-labelledby="side-label">
-              <output id="side-out" for="sideDeg"></output>
-            </div>
-          </div>
-          <div class="ctl ctl--point">
-            <label class="ctl-label" for="pointKg">Recovery points rated <small>if you know it</small></label>
-            <span class="mini-field"><input id="pointKg" type="number" inputmode="numeric" min="0" step="100" placeholder="–"><span>kg</span></span>
-          </div>
-        </div>
-        <ul class="shackles" id="shackles" role="radiogroup" aria-label="Shackle at this end"></ul>
+        <p class="part-label">Shackles: what to know</p>
         <div id="shackle-notes"></div>
       </div>
 

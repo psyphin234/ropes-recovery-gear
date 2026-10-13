@@ -2596,6 +2596,15 @@ select:focus {
 .end-tab-name { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
 .end-tab-sub { color: var(--text-muted); font-size: 0.8rem; }
 
+/* each end's shackle and bridle: inputs, so they sit with the others above the verdict */
+.ends { padding: 0 16px 16px; }
+.ends-label { margin: 0 0 8px; font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; }
+.ends .hint { margin: 8px 0 0; }
+.ends .shackles { grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 6px; }
+.ends .sk { padding: 7px 8px; }
+.ends .sk-kind { font-size: 0.64rem; letter-spacing: 0.01em; white-space: nowrap; }
+.ends .sk-name { font-size: 1.1rem; white-space: nowrap; }
+
 .hookup { display: grid; gap: 8px; margin-bottom: 14px; }
 .hook-bridle { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
 .hook-bridle[hidden] { display: none; }

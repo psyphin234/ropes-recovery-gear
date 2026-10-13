@@ -305,7 +305,7 @@
       v.className = "verdict verdict--info";
       v.replaceChildren(el("div", { class: "verdict-top" }, U.statusIcon("incomplete"), el("p", { class: "verdict-head" },
         { stuck: "Type the stuck vehicle's mass on it.", rec: "Type the recovery vehicle's mass on it.", mbs: `Type the ${gear.short.toLowerCase()}'s breaking strength (MBS) on it.`, length: `Type the ${gear.short.toLowerCase()}'s length.` }[R.missing])));
-      ["readouts", "sizes", "shackles", "shackle-notes", "stage-sources", "chart-snatch", "gauge-legend", "lanyard-body", "tree-body", "bridle-body", "lanyard-pic"].forEach((id) => $(id).replaceChildren());
+      ["readouts", "sizes", "shackles", "shackle-hint", "shackle-notes", "stage-sources", "chart-snatch", "gauge-legend", "lanyard-body", "tree-body", "bridle-body", "lanyard-pic"].forEach((id) => $(id).replaceChildren());
       renderTree();
       return;
     }
@@ -602,6 +602,7 @@
     $("shackles").replaceChildren(...all.map((s) => {
       const ok = s.wllKg > load;
       const usedAt = ends.filter((e) => e.shackle.id === s.id).map((e) => (e.side === "stuck" ? "Stuck end" : "Recovery end"));
+      if (usedAt.length === 2) usedAt.splice(0, 2, "Both ends");
       const b = el("button", { type: "button", role: "radio", class: "sk" + (ok ? " sk--pass" : " sk--fail"), "aria-checked": String(s.id === end.shackle.id) },
         usedAt.length ? el("span", { class: "sk-used" }, usedAt.join(" · ")) : null,
         el("span", { class: "sk-kind" }, s.kind === "soft" ? "Soft · Factor 55" : "SECURETECH bow"),
@@ -616,8 +617,8 @@
     const loadText = end.bridled
       ? `the ${t1(load)} each takes at ${R.speed} km/h: on the bridle, legs ${R.bridleDeg}° apart, each leg's shackle takes ${Math.round(end.share * 100)}% of the ${t1(demand)} peak (the wider the legs, the more each takes)`
       : `the ${t1(demand)} peak force at ${R.speed} km/h`;
+    $("shackle-hint").textContent = `Pick an end, then its shackle. Green: the WLL is above ${loadText}. That allows for the full load (SECURETECH; Bushranger: never exceed the shackles' WLL). Both ends go into the check below.${sd > 10 ? ` Pulled ${sd}° off in-line (this applies to every shackle), Crosby's chart leaves a screw pin shackle ${Math.round(keep * 100)}% of its WLL; we found no such figure for soft shackles.` : ""}`;
     $("shackle-notes").replaceChildren(
-      el("p", { class: "hint" }, `Pick an end above, then its shackle here. Green: the WLL is above ${loadText}. That allows for the full load (SECURETECH; Bushranger: never exceed the shackles' WLL). Both ends go into the check above.${sd > 10 ? ` Pulled ${sd}° off in-line (this applies to every shackle), Crosby's chart leaves a screw pin shackle ${Math.round(keep * 100)}% of its WLL; we found no such figure for soft shackles.` : ""}`),
       el("ul", { class: "rules-list" },
         el("li", null, el("strong", null, "Rated bow shackles only: "), "SECURETECH: never commercial or D shackles (a commercial one has a pin as thin as its body and no markings); at least 2 t WLL, and 2 to 6.5 t covers most recoveries. Tighten the pin, then back it off half a turn."),
         el("li", null, el("strong", null, "Side pulls: "), "a rated bow shackle can take one, but at 90° its rating halves (SECURETECH). Several eyes go on the bow, not the pin; shackle to shackle is bow to bow or bow to pin, never pin to pin."),
