@@ -93,3 +93,7 @@ tests/            index.html + calc.test.js; run.ps1 runs them in headless Edge
 - Header: the same `.brand-bar` as the other tools; favicons and `logo.jpg` are copies from the winching page.
 - GoatCounter tag on both pages with the host-prefix snippet, as on the other tools.
 - Brand is written **PsyPhin**. Commit identity: `74655215+psyphin234@users.noreply.github.com`. Ask before pushing anything live.
+
+## Search (SEO)
+
+Set up 2026-10-13, following the [Runbook: SEO for Small Sites & Tools](https://claude.ai/code/artifact/0e4d5503-7f20-4cb5-a25b-840f4caa3545). The `<title>` leads with the tool's name and adds the words people search for; the meta description is at most 155 characters (Google cuts the rest). `index.html` has a `WebApplication` JSON-LD block (keep its description the same as the meta description), an Open Graph image (the psyphin.co.za card image), and the footer's "More 4x4 tools" line links the winch, tyres and towing tools, which link back. `robots.txt` and `sitemap.xml` are at the site root: **update the sitemap's `lastmod` when a page's content changes.** Still `noindex`: the sitemap already lists both pages, so going live is just deleting the meta tags.
