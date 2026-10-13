@@ -10,6 +10,8 @@ Repo `psyphin234/ropes-recovery-gear` (public), GitHub Pages from `main` / root,
 
 **Danger warnings (owner's requirement, 2026-10-12):** the site must say plainly that recovery is dangerous, that it's for information only, and that judgement on the scene overrides it. That's the red `.danger` box under the intro on both pages (kept compact at the owner's request, 2026-10-12: those three points stay visible, the detail and SECURETECH's advice fold into "Why, and what to do"), the line under every verdict, the disclaimer (no liability) and the footer. Keep them.
 
+**Inputs vs worked-out figures (owner, 2026-10-13, as on the winching page):** everything the visitor can change is blue: typed fields have a blue box, blue value and a pencil (`--input-bg`, `--input-border`, `--pencil`), selected chips and cards are blue, slider values are blue. Worked-out figures stay plain: the readouts under the snatch and the safety-strap figures (`.figure`) have no box, and the shackle cards' "used at" tag is grey. A one-line key under "Try:" (`.try-hint`) says so. Keep blue boxes for inputs only.
+
 Plain HTML/CSS/vanilla JS, classic scripts (no modules, no build step), so `index.html` opens straight from disk. Inputs are only kept in the visitor's own `localStorage` (key `ropes-recovery-v1`).
 
 **Status: UNDER CONSTRUCTION.** Both pages carry the amber `.construction` banner and `<meta name="robots" content="noindex">`. Keep both until the owner says otherwise.

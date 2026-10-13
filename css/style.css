@@ -10,6 +10,11 @@
   --accent: #3fb6ff;
   --accent-strong: #1e8fff;
 
+  /* anything the visitor can change: blue box, blue value, pencil (worked-out figures stay plain) */
+  --input-bg: color-mix(in srgb, var(--accent) 12%, var(--surface-2));
+  --input-border: color-mix(in srgb, var(--accent) 70%, var(--border));
+  --pencil: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%233fb6ff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11.2 2.3l2.5 2.5-8.4 8.4-3.2.7.7-3.2z'/%3E%3Cpath d='M9.6 3.9l2.5 2.5'/%3E%3C/svg%3E");
+
   /* traffic light */
   --pass: #4ade80;
   --warn: #fbbf24;
@@ -1314,14 +1319,13 @@ select:focus {
   margin-top: 12px;
 }
 
+/* worked out, not typed: plain figures, no box (a box means you can change it) */
 .figure {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 12px 14px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  padding: 2px 12px;
+  border-left: 2px solid var(--border);
 }
 
 .figure-label {
@@ -1692,6 +1696,27 @@ select:focus {
   border-color: var(--accent);
 }
 
+/* the key to inputs vs worked-out figures; after the chips (they're added by app.js) */
+.try-hint {
+  order: 1;
+  flex-basis: 100%;
+  margin: 2px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.try-key {
+  flex: none;
+  width: 26px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg) var(--pencil) no-repeat right 3px center / 10px;
+}
+
 /* ------------------------------------------------------------ scene */
 .scene {
   position: relative;
@@ -1725,7 +1750,7 @@ select:focus {
   padding: 7px 10px 8px;
   border-radius: 12px;
   background: rgba(10, 14, 19, 0.82);
-  border: 1px solid rgba(63, 182, 255, 0.55);
+  border: 1px solid var(--accent);
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(4px);
   min-width: 132px;
@@ -1754,21 +1779,22 @@ select:focus {
 .sf-input input {
   width: 100%;
   min-width: 0;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px dashed rgba(230, 235, 239, 0.35);
-  color: var(--text);
+  background: var(--input-bg) var(--pencil) no-repeat right 6px center / 13px;
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  color: var(--accent);
   font: inherit;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.3rem;
   line-height: 1.1;
-  padding: 0 0 2px;
+  padding: 2px 24px 2px 6px;
 }
 
 .sf-input input:focus {
   outline: none;
-  border-bottom-color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 .sf-hint {
@@ -2120,19 +2146,27 @@ select:focus {
 }
 
 .mini-field input {
-  width: 4.2em;
+  width: calc(3.4em + 22px);
   min-height: 0;
-  padding: 2px 4px;
+  padding: 2px 22px 2px 6px;
   font: inherit;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.05rem;
-  color: var(--text);
+  color: var(--accent);
   text-align: center;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--input-bg) var(--pencil) no-repeat right 5px center / 12px;
+  border: 1px solid var(--input-border);
   border-radius: 6px;
 }
+
+/* typed figures: no spinner arrows over the pencil (arrow keys still step them) */
+.sf-input input[type="number"],
+.mini-field input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+.sf-input input::-webkit-inner-spin-button,
+.sf-input input::-webkit-outer-spin-button,
+.mini-field input::-webkit-inner-spin-button,
+.mini-field input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
 .mini-field input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
 
@@ -2243,13 +2277,13 @@ select:focus {
   margin-top: 14px;
 }
 
+/* worked out, not typed: plain figures, no box (a box means you can change it) */
 .readout {
   display: grid;
+  align-content: start;
   gap: 1px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  padding: 2px 12px;
+  border-left: 2px solid var(--border);
 }
 
 .readout-label { font-size: 0.75rem; color: var(--text-muted); }
@@ -2377,7 +2411,7 @@ select:focus {
 .scene-field--strap { min-width: 168px; max-width: 190px; }
 .scene-field--strap .sf-input > span { white-space: nowrap; }
 #stage-sources { padding: 0 16px 16px; }
-.sf-input--small input { font-size: 1.05rem; width: 3.2em; flex: none; }
+.sf-input--small input { font-size: 1.05rem; width: calc(2.4em + 24px); flex: none; }
 
 @media (max-width: 860px) {
   .scene > .scene-fields .scene-field--strap { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
@@ -2410,6 +2444,7 @@ select:focus {
 .slider output {
   font-family: var(--font-display);
   font-weight: 700;
+  color: var(--accent);
   font-size: 1.15rem;
   min-width: 4.6em;
   text-align: right;
@@ -2570,8 +2605,8 @@ select:focus {
   justify-self: start;
   font-size: 0.68rem;
   font-weight: 600;
-  color: var(--accent);
-  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--text);
+  border: 1px solid var(--text-muted);
   border-radius: 999px;
   padding: 0 6px;
 }
@@ -2586,7 +2621,7 @@ select:focus {
 }
 
 .ctl--side { flex: 1 1 340px; max-width: 520px; }
-.ctl--point .mini-field input { width: 5.5em; }
+.ctl--point .mini-field input { width: calc(4.6em + 22px); }
 .shackle-svg { display: block; width: 64px; height: 64px; }
 .sv-bow { fill: none; stroke: #c8d1da; stroke-width: 6; stroke-linecap: round; }
 .sv-pin { fill: #8a96a3; }
@@ -2679,9 +2714,9 @@ select:focus {
 
 .job-pic { min-height: 120px; display: grid; place-items: center; }
 .job-controls { display: grid; gap: 8px; }
-.job-controls .mini-field input { width: 5.5em; }
+.job-controls .mini-field input { width: calc(4.6em + 22px); }
 .job-figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
-.job-figs .figure { padding: 8px 10px; background: var(--surface); }
+.job-figs .figure { padding: 2px 10px; }
 .job-figs .figure-value { font-size: 1.45rem; }
 .figure--pass { border-left: 4px solid var(--pass); }
 .figure--fail { border-left: 4px solid var(--fail); }
