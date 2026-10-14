@@ -14,7 +14,7 @@ Repo `psyphin234/ropes-recovery-gear` (public), GitHub Pages from `main` / root,
 
 Plain HTML/CSS/vanilla JS, classic scripts (no modules, no build step), so `index.html` opens straight from disk. Inputs are only kept in the visitor's own `localStorage` (key `ropes-recovery-v1`).
 
-**Status: finished** (owner, 2026-10-14). `noindex` removed from both pages 2026-10-14, so Google may list them. The amber `.construction` banner stays until the owner says otherwise.
+**Status: finished** (owner, 2026-10-14). `noindex` removed from both pages 2026-10-14, so Google may list them. The amber `.construction` banner was removed the same day (its CSS is kept); the psyphin.co.za card is green "Actively maintained".
 
 ## Source policy (owner's rule, non-negotiable)
 
