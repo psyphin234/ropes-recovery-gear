@@ -14,7 +14,7 @@ Repo `psyphin234/ropes-recovery-gear` (public), GitHub Pages from `main` / root,
 
 Plain HTML/CSS/vanilla JS, classic scripts (no modules, no build step), so `index.html` opens straight from disk. Inputs are only kept in the visitor's own `localStorage` (key `ropes-recovery-v1`).
 
-**Status: UNDER CONSTRUCTION.** Both pages carry the amber `.construction` banner and `<meta name="robots" content="noindex">`. Keep both until the owner says otherwise.
+**Status: finished** (owner, 2026-10-14). `noindex` removed from both pages 2026-10-14, so Google may list them. The amber `.construction` banner stays until the owner says otherwise.
 
 ## Source policy (owner's rule, non-negotiable)
 
@@ -96,4 +96,4 @@ tests/            index.html + calc.test.js; run.ps1 runs them in headless Edge
 
 ## Search (SEO)
 
-Set up 2026-10-13, following the [Runbook: SEO for Small Sites & Tools](https://claude.ai/code/artifact/0e4d5503-7f20-4cb5-a25b-840f4caa3545). The `<title>` leads with the tool's name and adds the words people search for; the meta description is at most 155 characters (Google cuts the rest). `index.html` has a `WebApplication` JSON-LD block (keep its description the same as the meta description), an Open Graph image (the psyphin.co.za card image), and the footer's "More 4x4 tools" line links the winch, tyres and towing tools, which link back. `robots.txt` and `sitemap.xml` are at the site root: **update the sitemap's `lastmod` when a page's content changes.** Still `noindex`: the sitemap already lists both pages, so going live is just deleting the meta tags.
+Set up 2026-10-13, following the [Runbook: SEO for Small Sites & Tools](https://claude.ai/code/artifact/0e4d5503-7f20-4cb5-a25b-840f4caa3545). The `<title>` leads with the tool's name and adds the words people search for; the meta description is at most 155 characters (Google cuts the rest). `index.html` has a `WebApplication` JSON-LD block (keep its description the same as the meta description), an Open Graph image (the psyphin.co.za card image), and the footer's "More 4x4 tools" line links the winch, tyres and towing tools, which link back. `robots.txt` and `sitemap.xml` are at the site root: **update the sitemap's `lastmod` when a page's content changes.** Indexable since 2026-10-14 (the `noindex` meta tags were removed).
