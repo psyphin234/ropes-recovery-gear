@@ -719,6 +719,31 @@
     fill("explain-gaps",
       el("p", null, "Where no standard or maker publishes a figure, this page says so rather than filling the gap with a rule of thumb."),
       el("ul", null, D.gaps.map((x) => el("li", null, el("strong", null, x.title + ": "), x.text))));
+
+    // Common questions: the questions are in index.html; every figure here comes from data.js.
+    const size = D.rule("securetech-sizing").params;
+    const exGvm = 2900;
+    fill("faq-size",
+      el("p", null, `Rate it by the stuck vehicle's mass (its GVM, on the licence disc). SECURETECH recommends a breaking strength of at least ${size.recommended} times that mass (${size.recommended}:1); the lowest factor it notes is ${size.min}:1. For a ${U.kg(exGvm)} double cab, that's ${U.tonnes(exGvm * size.recommended / 1000)} recommended.`),
+      el("p", null, "Read the stitched-in label: a good strap or rope gives its maker, specification and strength. The calculator above checks your strap against both vehicles and the snatch."),
+      U.sourcesLine(["securetech-sizing"]));
+    const pct = (id) => U.n(D.rule(id).params.stretch * 100) + "%";
+    fill("faq-types",
+      el("p", null, `How far they stretch. At the low end of SECURETECH's figures, a snatch strap (polyamide webbing) stretches about ${pct("strap-stretch")} of its length and a kinetic rope (plaited polyamide) about ${pct("kinetic-stretch")}. More stretch spreads the stop over a longer distance, so a kinetic rope is gentler on both vehicles and their recovery points.`),
+      el("p", null, `A pull strap stretches only about ${pct("static-stretch")}: it's for a steady pull on a lightly stuck vehicle, not for snatching.`),
+      U.sourcesLine(["strap-stretch", "kinetic-stretch", "static-stretch"]));
+    fill("faq-speed",
+      el("p", null, `SECURETECH suggests about ${U.n(D.rule("snatch-speed").params.suggestedKmh)} km/h for two vehicles of similar mass. Lay the strap out in an S with a little slack, move off in first gear low range, straight away from the stuck vehicle, and try to stop before the strap stops you. If it's still stuck, winch it.`),
+      el("p", null, "Speed is what you control that changes the force most: at twice the speed, the peak force is twice as high."),
+      U.sourcesLine(["snatch-speed", "kinetic-model"]));
+    fill("faq-towball",
+      el("p", null, "No. SECURETECH: a tow bar or tow ball is unsuitable as a recovery point, because tow balls are designed to break under extreme loads, and a broken one becomes a missile. Every vehicle in a recovery needs professionally fitted, rated recovery points front and rear, ideally two at each end so a bridle can be used."),
+      U.sourcesLine(["recovery-point"]));
+    const side90 = D.sideLoad[D.sideLoad.length - 1];
+    fill("faq-shackles",
+      el("p", null, `Rated alloy bow shackles with a WLL of at least ${U.kg(D.rule("shackle-ratings").params.minWllKg)}, never commercial or D shackles. A rated shackle is marked with its WLL and has a thicker pin than its body.`),
+      el("p", null, `Pulled from the side at ${side90.toDeg}°, a shackle keeps only ${U.n(side90.keep * 100)}% of its rating. And never join two straps with a shackle: if something fails it becomes a missile. Use a recovery link instead.`),
+      U.sourcesLine(["shackle-ratings", "shackle-side-load", "no-shackle-join"]));
   }
 
   // ------------------------------------------------------------ go
