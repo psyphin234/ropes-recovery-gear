@@ -92,8 +92,8 @@
 
     const defs = svg("defs", null,
       svg("linearGradient", { id: "sc-sky", x1: 0, y1: 0, x2: 0, y2: 1 },
-        svg("stop", { offset: "0", "stop-color": "#0a0e13" }),
-        svg("stop", { offset: "1", "stop-color": "#18212b" })),
+        svg("stop", { offset: "0", "stop-color": "#060c22" }),
+        svg("stop", { offset: "1", "stop-color": "#101d42" })),
       svg("pattern", { id: "sc-sand", width: 48, height: 48, patternUnits: "userSpaceOnUse" },
         svg("rect", { width: 48, height: 48, fill: "#b48a52" }),
         [10, 26, 42].map((y) => svg("path", { d: `M0 ${y} q12 -5 24 0 t24 0`, fill: "none", stroke: "#9c7442", "stroke-width": 1.6 }))));
