@@ -130,7 +130,7 @@
     ends.filter((e) => e.bridled).forEach((e) => {
       if (e.vehicleKg > bridle.maxVehicleKg) {
         const bigger = D.bridles.find((b) => b.maxVehicleKg >= e.vehicleKg);
-        issues.push({ tone: "fail", head: `The bridle is too light for the ${e.vehicle}`, detail: `SECURETECH rates its ${bridle.label} bridle for vehicles up to ${U.kg(bridle.maxVehicleKg)}; the ${e.vehicle} is ${U.kg(e.vehicleKg)}.`, fix: bigger ? { text: `Use SECURETECH's ${bigger.label} bridle`, patch: { bridle: bigger.id } } : { text: "SECURETECH lists no bridle for a vehicle this heavy", patch: null } });
+        issues.push({ tone: "fail", head: `The bridle is too light for the ${e.vehicle}`, detail: `SECURETECH rates its ${bridle.label} bridle for vehicles up to ${U.kg(bridle.maxVehicleKg)}, but the ${e.vehicle} is ${U.kg(e.vehicleKg)}.`, fix: bigger ? { text: `Use SECURETECH's ${bigger.label} bridle`, patch: { bridle: bigger.id } } : { text: "SECURETECH lists no bridle for a vehicle this heavy", patch: null } });
       }
       if (e.shackle.kind === "soft") issues.push({ tone: "warn", head: `Soft shackles on the ${e.side === "stuck" ? "stuck" : "recovery"} end's bridle`, detail: "SECURETECH fits its bridles to the vehicle with rated bow shackles." });
     });
@@ -345,7 +345,7 @@
     if (S.gear === "static") {
       tone = "fail";
       head = "A static pull strap isn't for snatching";
-      detail = `It hardly stretches, so the same snatch hits ${Math.round((demand / C.kinetic({ massKg: R.recv, mbsKg: R.mbs, lengthM: R.len, stretch: C.stretchOf("kinetic"), speedKmh: speed }).peakIfUnbrokenKg) * 100 - 100)}% harder than with a kinetic rope of the same strength: ${t1(demand)} at ${speed} km/h. SECURETECH: a pull strap is for a steady pull on a lightly stuck vehicle, the first option; kinetic straps and ropes are the last.`;
+      detail = `It hardly stretches, so the same snatch hits ${Math.round((demand / C.kinetic({ massKg: R.recv, mbsKg: R.mbs, lengthM: R.len, stretch: C.stretchOf("kinetic"), speedKmh: speed }).peakIfUnbrokenKg) * 100 - 100)}% harder than with a kinetic rope of the same strength: ${t1(demand)} at ${speed} km/h. SECURETECH: a pull strap is for a steady pull on a lightly stuck vehicle and is the first option. Kinetic straps and ropes are the last.`;
       fix = { text: "Use a kinetic rope instead", patch: { gear: "kinetic" } };
     } else if (over.length) {
       tone = "fail";
@@ -363,7 +363,7 @@
     } else if (fit === "under") {
       tone = "fail";
       head = `Too light for the ${t1(R.stuck)} stuck vehicle`;
-      detail = `SECURETECH rates straps and ropes by the stuck vehicle's mass. Its lowest noted factor of safety, 2:1, needs ${t1(range.minKg)}; it recommends 4:1, ${t1(range.recKg)}.`;
+      detail = `SECURETECH rates straps and ropes by the stuck vehicle's mass. Its lowest noted factor of safety, 2:1, needs ${t1(range.minKg)}. It recommends 4:1, ${t1(range.recKg)}.`;
       fix = { text: `Use a ${t1(Math.ceil(range.recKg / 1000) * 1000)} ${gear.short.toLowerCase()}`, patch: { mbsKg: Math.ceil(range.recKg / 1000) * 1000 } };
     } else {
       tone = fit === "low" ? "warn" : "pass";
@@ -392,7 +392,7 @@
       el("strong", { class: "bal-val" }, el("span", { class: "bal-ok tone-" + (l.ok ? "pass" : "fail") }, U.statusIcon(l.ok ? "pass" : "fail")), t1(l.kg)))));
 
     const sub = el("p", { class: "verdict-sub" },
-      `The ${t1(R.recv)} recovery vehicle at ${speed} km/h carries ${U.n(kin.energyJ / 1000, 0.1)} kJ; the ${gear.short.toLowerCase()} (${U.n(R.len, 0.1)} m, ${Math.round(R.stretch * 1000) / 10}% stretch at break) soaks it up as stretch and gives it back as pull. Worked out with the stuck vehicle held still, the hardest case: a calculation, not a measurement, so a real snatch peaks lower. SECURETECH suggests 18 km/h for two vehicles of similar mass. The line on each bar is the load on that part at the peak.`,
+      `The ${t1(R.recv)} recovery vehicle at ${speed} km/h carries ${U.n(kin.energyJ / 1000, 0.1)} kJ. The ${gear.short.toLowerCase()} (${U.n(R.len, 0.1)} m, ${Math.round(R.stretch * 1000) / 10}% stretch at break) soaks it up as stretch and gives it back as pull. This is worked out with the stuck vehicle held still, which is the hardest case. It's a calculation, not a measurement, so a real snatch peaks lower. SECURETECH suggests 18 km/h for two vehicles of similar mass. The line on each bar is the load on that part at the peak.`,
       el("strong", { class: "verdict-warn" }, " For information only: whatever this says, judge the recovery on the scene."));
 
     let fixEl = null;
@@ -432,7 +432,7 @@
     $("chart-snatch").replaceChildren(
       el("p", { class: "chart-title" }, el("span", { class: "key key--force" }), "Force in the strap", ...limits.map((l) => [el("span", { class: "key key--" + l.type }), l.short])),
       snatchChart.el);
-    $("play-slow").textContent = `The real snatch takes ${U.n(kin.tEnd, 0.01)} s; played ${Math.round((DUR * (1 - LEAD)) / 1000 / kin.tEnd)}× slower.`;
+    $("play-slow").textContent = `The real snatch takes ${U.n(kin.tEnd, 0.01)} s, played ${Math.round((DUR * (1 - LEAD)) / 1000 / kin.tEnd)}× slower.`;
 
     live = {};
     const tile = (key, label) => {
@@ -588,7 +588,7 @@
       el("div", { class: "table-wrap" }, el("table", { class: "limit-table speed-table" },
         el("thead", null, el("tr", null, el("th", { scope: "col" }, "Kind"), el("th", { scope: "col", class: "num" }, "Stretch"), el("th", { scope: "col", class: "num" }, `Peak, ${speed} km/h`), el("th", { scope: "col", class: "num" }, "Keep under"))),
         el("tbody", null, rows))),
-      el("p", { class: "hint" }, `Stretch is what makes a kinetic recovery gentle: the more a strap or rope stretches, the longer it takes to stop the recovery vehicle, and the lower the peak. A static pull strap (low-elongation polyester, about 5%) peaks ${U.n(Math.sqrt(C.stretchOf("strap") / C.stretchOf("static")), 0.1)} times as hard as a snatch strap of the same strength. "Keep under" is the speed at which the peak reaches the weakest part: ${["the strap", "either end's shackles"].concat(R.ends.some((e) => e.bridled) ? ["the bridle"] : [], R.pointKg ? ["the recovery points"] : []).join(", ").replace(/, ([^,]*)$/, " or $1")}. Stretch figures: SECURETECH's 20–25% for straps and 30–40% for ropes, taken at the low end (the higher force), and the 5% SECURETECH gives for its low-elongation polyester webbing for the pull strap (it publishes no pull strap figure); yours may differ. SECURETECH: kinetic straps and ropes must never anchor a winch or extend a winch cable.`),
+      el("p", { class: "hint" }, `Stretch is what makes a kinetic recovery gentle: the more a strap or rope stretches, the longer it takes to stop the recovery vehicle, and the lower the peak. A static pull strap (low-elongation polyester, about 5%) peaks ${U.n(Math.sqrt(C.stretchOf("strap") / C.stretchOf("static")), 0.1)} times as hard as a snatch strap of the same strength. "Keep under" is the speed at which the peak reaches the weakest part: ${["the strap", "either end's shackles"].concat(R.ends.some((e) => e.bridled) ? ["the bridle"] : [], R.pointKg ? ["the recovery points"] : []).join(", ").replace(/, ([^,]*)$/, " or $1")}. Stretch figures: SECURETECH's 20–25% for straps and 30–40% for ropes, taken at the low end (the higher force), and the 5% SECURETECH gives for its low-elongation polyester webbing for the pull strap (it publishes no pull strap figure). Yours may differ. SECURETECH: kinetic straps and ropes must never anchor a winch or extend a winch cable.`),
       U.sourcesLine(["securetech-sizing", "strap-stretch", "kinetic-stretch", "snatch-speed", "static-stretch", "kinetic-model"]));
   }
 
@@ -617,11 +617,11 @@
     const loadText = end.bridled
       ? `the ${t1(load)} each takes at ${R.speed} km/h: on the bridle, legs ${R.bridleDeg}° apart, each leg's shackle takes ${Math.round(end.share * 100)}% of the ${t1(demand)} peak (the wider the legs, the more each takes)`
       : `the ${t1(demand)} peak force at ${R.speed} km/h`;
-    $("shackle-hint").textContent = `Pick an end, then its shackle. Green: the WLL is above ${loadText}. That allows for the full load (SECURETECH; Bushranger: never exceed the shackles' WLL). Both ends go into the check below.${sd > 10 ? ` Pulled ${sd}° off in-line (this applies to every shackle), Crosby's chart leaves a screw pin shackle ${Math.round(keep * 100)}% of its WLL; we found no such figure for soft shackles.` : ""}`;
+    $("shackle-hint").textContent = `Pick an end, then its shackle. Green: the WLL is above ${loadText}. That allows for the full load (SECURETECH; Bushranger: never exceed the shackles' WLL). Both ends go into the check below.${sd > 10 ? ` Pulled ${sd}° off in-line (this applies to every shackle), Crosby's chart leaves a screw pin shackle ${Math.round(keep * 100)}% of its WLL. We found no such figure for soft shackles.` : ""}`;
     $("shackle-notes").replaceChildren(
       el("ul", { class: "rules-list" },
-        el("li", null, el("strong", null, "Rated bow shackles only: "), "SECURETECH: never commercial or D shackles (a commercial one has a pin as thin as its body and no markings); at least 2 t WLL, and 2 to 6.5 t covers most recoveries. Tighten the pin, then back it off half a turn."),
-        el("li", null, el("strong", null, "Side pulls: "), "a rated bow shackle can take one, but at 90° its rating halves (SECURETECH). Several eyes go on the bow, not the pin; shackle to shackle is bow to bow or bow to pin, never pin to pin."),
+        el("li", null, el("strong", null, "Rated bow shackles only: "), "SECURETECH: never commercial or D shackles (a commercial one has a pin as thin as its body and no markings). Use at least 2 t WLL, and 2 to 6.5 t covers most recoveries. Tighten the pin, then back it off half a turn."),
+        el("li", null, el("strong", null, "Side pulls: "), "a rated bow shackle can take one, but at 90° its rating halves (SECURETECH). Several eyes go on the bow, not the pin. Shackle to shackle is bow to bow or bow to pin, never pin to pin."),
         el("li", null, el("strong", null, "Two legs in one bow, at most 120° apart "), "(Crosby): a bridle or a tree protector's two ends. More on that below."),
         el("li", null, el("strong", null, "Never join two straps with a shackle. "), "SECURETECH: use a recovery link between the eyes, and only join straps of the same rating and function. If one breaks, a shackle becomes a missile."),
         el("li", null, el("strong", null, "Big enough: "), "SECURETECH says the shackle must not pinch a lanyard or bridle, and its pin must fit through your recovery points.")),
@@ -644,7 +644,7 @@
         el("li", null, el("strong", null, "Fitted correctly: "), "SECURETECH ties its lanyard (low-stretch polyester webbing, 1.4 or 1.8 m long) to the vehicle and over the strap, rope or cable with two loose ring hitch knots, never on the same point as the strap or bridle."),
         el("li", null, el("strong", null, "With a bridle: "), "SECURETECH says to use two lanyards as well."),
         el("li", null, el("strong", null, "Everyone out: "), "get out of both vehicles and stand well away, never in line with the strap or in the recovery vehicle's path.")),
-      el("p", { class: "hint" }, "A lanyard holds the parts; it doesn't make standing close safe. SECURETECH publishes no breaking strength for its lanyard online, and nobody we found publishes how far a broken strap or shackle flies."),
+      el("p", { class: "hint" }, "A lanyard holds the parts, but it doesn't make standing close safe. SECURETECH publishes no breaking strength for its lanyard online, and nobody we found publishes how far a broken strap or shackle flies."),
       U.sourcesLine(["safety-lanyard", "stand-clear"]));
   }
 
@@ -690,9 +690,9 @@
     const times = b.breakKg / legKg;
     $("bridle-body").replaceChildren(...[
       el("div", { class: "job-figs" },
-        U.figure("Each point takes", t1(legKg), `${Math.round((legKg / pull) * 100)}% of the ${t1(pull)} snatch above${R.pointKg ? `; points rated ${t1(R.pointKg)}` : ""}`),
+        U.figure("Each point takes", t1(legKg), `${Math.round((legKg / pull) * 100)}% of the ${t1(pull)} snatch above${R.pointKg ? `, points rated ${t1(R.pointKg)}` : ""}`),
         U.figure(`SECURETECH ${b.label}`, `breaks at ${t1(b.breakKg)}`, `${U.n(times, 0.1)} × each leg's load · for vehicles up to ${U.n(b.maxVehicleKg, 1)} kg`, massOk ? "figure--pass" : "figure--fail")),
-      massOk ? null : el("p", { class: "warn-line tone-fail" }, U.statusIcon("fail"), `SECURETECH rates this bridle for vehicles up to ${U.n(b.maxVehicleKg, 1)} kg; the heavier vehicle here is ${U.kg(heavier)}.`),
+      massOk ? null : el("p", { class: "warn-line tone-fail" }, U.statusIcon("fail"), `SECURETECH rates this bridle for vehicles up to ${U.n(b.maxVehicleKg, 1)} kg, but the heavier vehicle here is ${U.kg(heavier)}.`),
       over ? el("p", { class: "warn-line tone-fail" }, U.statusIcon("fail"), `Over ${maxDeg}°: Crosby says never put two legs that far apart in one shackle. Use a longer bridle.`) : null,
       el("p", { class: "hint" }, R.ends.some((e) => e.bridled)
         ? `In the check above at the ${R.ends.filter((e) => e.bridled).map((e) => e.name.toLowerCase()).join(" and the ")}: the same bridle and angle.`
@@ -714,7 +714,7 @@
       U.sourcesLine(["kinetic-model", "strap-stretch", "kinetic-stretch"]));
     fill("explain-mbs",
       el("p", null, D.rule("wll-mbs").summary),
-      el("p", null, "A strap is picked by vehicle mass (its MBS against the GVM); a shackle by its WLL against the force it will see. A 4.75 t bow shackle's WLL next to a 12 t strap's MBS makes the shackle look like the weak link, but SECURETECH's rated bow shackles have a 6:1 factor of safety: a 4.75 t one breaks at 28.5 t or more."),
+      el("p", null, "A strap is picked by vehicle mass (its MBS against the GVM). A shackle is picked by its WLL against the force it will see. A 4.75 t bow shackle's WLL next to a 12 t strap's MBS makes the shackle look like the weak link, but SECURETECH's rated bow shackles have a 6:1 factor of safety: a 4.75 t one breaks at 28.5 t or more."),
       U.sourcesLine(["wll-mbs", "shackle-ratings", "securetech-sizing"]));
     fill("explain-gaps",
       el("p", null, "Where no standard or maker publishes a figure, this page says so rather than filling the gap with a rule of thumb."),
@@ -724,7 +724,7 @@
     const size = D.rule("securetech-sizing").params;
     const exGvm = 2900;
     fill("faq-size",
-      el("p", null, `Rate it by the stuck vehicle's mass (its GVM, on the licence disc). SECURETECH recommends a breaking strength of at least ${size.recommended} times that mass (${size.recommended}:1); the lowest factor it notes is ${size.min}:1. For a ${U.kg(exGvm)} double cab, that's ${U.tonnes(exGvm * size.recommended / 1000)} recommended.`),
+      el("p", null, `Rate it by the stuck vehicle's mass (its GVM, on the licence disc). SECURETECH recommends a breaking strength of at least ${size.recommended} times that mass (${size.recommended}:1). The lowest factor it notes is ${size.min}:1. For a ${U.kg(exGvm)} double cab, that's ${U.tonnes(exGvm * size.recommended / 1000)} recommended.`),
       el("p", null, "Read the stitched-in label: a good strap or rope gives its maker, specification and strength. The calculator above checks your strap against both vehicles and the snatch."),
       U.sourcesLine(["securetech-sizing"]));
     const pct = (id) => U.n(D.rule(id).params.stretch * 100) + "%";
