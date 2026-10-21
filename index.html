@@ -92,18 +92,18 @@
           <div class="scene-fields">
             <label class="scene-field" id="f-stuck">
               <span class="sf-label">Stuck vehicle</span>
-              <span class="sf-input"><input id="stuckKg" type="number" inputmode="numeric" min="0" step="50" autocomplete="off"><span>kg</span></span>
+              <span class="sf-input"><input id="stuckKg" type="text" inputmode="numeric" min="0" step="50" autocomplete="off"><span>kg</span></span>
               <span class="sf-hint">GVM, or weighbridge</span>
             </label>
             <label class="scene-field" id="f-rec">
               <span class="sf-label">Recovery vehicle</span>
-              <span class="sf-input"><input id="recKg" type="number" inputmode="numeric" min="0" step="50" autocomplete="off"><span>kg</span></span>
+              <span class="sf-input"><input id="recKg" type="text" inputmode="numeric" min="0" step="50" autocomplete="off"><span>kg</span></span>
               <span class="sf-hint">the one that pulls</span>
             </label>
             <div class="scene-field scene-field--strap" id="f-strap">
               <span class="sf-label" id="strap-label">Strap</span>
-              <label class="sf-input"><input id="mbsKg" type="number" inputmode="numeric" min="0" step="100" autocomplete="off" aria-labelledby="strap-label mbs-unit"><span id="mbs-unit">kg MBS</span></label>
-              <label class="sf-input sf-input--small"><input id="lengthM" type="number" inputmode="decimal" min="1" step="0.5" autocomplete="off" aria-labelledby="strap-label len-unit"><span id="len-unit">m long</span></label>
+              <label class="sf-input"><input id="mbsKg" type="text" inputmode="numeric" min="0" step="100" autocomplete="off" aria-labelledby="strap-label mbs-unit"><span id="mbs-unit">kg MBS</span></label>
+              <label class="sf-input sf-input--small"><input id="lengthM" type="text" inputmode="decimal" min="1" step="0.5" autocomplete="off" aria-labelledby="strap-label len-unit"><span id="len-unit">m long</span></label>
             </div>
           </div>
         </div>
@@ -149,7 +149,7 @@
           </div>
           <div class="ctl ctl--point">
             <label class="ctl-label" for="pointKg">Recovery points rated <small>if you know it</small></label>
-            <span class="mini-field"><input id="pointKg" type="number" inputmode="numeric" min="0" step="100" placeholder="–"><span>kg</span></span>
+            <span class="mini-field"><input id="pointKg" type="text" inputmode="numeric" min="0" step="100" placeholder="–"><span>kg</span></span>
           </div>
         </div>
         <ul class="shackles" id="shackles" role="radiogroup" aria-label="Shackle at this end"></ul>
@@ -205,7 +205,7 @@
             <h3 class="job-title" id="job-tree-title"><span class="job-num">2</span> Tree protector <small>ties the rope to the anchor</small></h3>
             <div class="job-pic" id="tree-pic"></div>
             <div class="job-controls">
-              <label class="mini-field">Pull on the anchor <input id="treePullKg" type="number" inputmode="numeric" min="0" step="50"><span>kg</span></label>
+              <label class="mini-field">Pull on the anchor <input id="treePullKg" type="text" inputmode="numeric" min="0" step="50"><span>kg</span></label>
               <p class="hint">On a single line, at most your winch's rated pull, in kg.</p>
               <div class="chips chips--small" id="protector-chips" role="radiogroup" aria-label="Tree protector"></div>
               <div class="slider">

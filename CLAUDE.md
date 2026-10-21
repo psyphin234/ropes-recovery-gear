@@ -14,6 +14,8 @@ Repo `psyphin234/ropes-recovery-gear` (public), GitHub Pages from `main` / root,
 
 **Inputs vs worked-out figures (owner, 2026-10-13, as on the winching page):** everything the visitor can change is blue: typed fields have a blue box, blue value and a pencil (`--input-bg`, `--input-border`, `--pencil`), selected chips and cards are blue, slider values are blue. Worked-out figures stay plain: the readouts under the snatch and the safety-strap figures (`.figure`) have no box, and the shackle cards' "used at" tag is grey. A one-line key under "Try:" (`.try-hint`) says so. Keep blue boxes for inputs only.
 
+**Number boxes are `type="text"` with `inputmode`**, not `type="number"` (since 2026-10-21: on the EV page a tester's iPhone turned "6,2" into 62, because Safari's number boxes mangle a decimal comma, and South African keypads show a comma). `C.parseNumber()` in calc.js reads what was typed (comma or point decimal, spaces or commas for thousands; tested), and app.js steps the value on the up and down arrows using the `step`/`min`/`max` attributes. The CSS finds them as `input[inputmode]`. Keep new number boxes the same way.
+
 Plain HTML/CSS/vanilla JS, classic scripts (no modules, no build step), so `index.html` opens straight from disk. Inputs are only kept in the visitor's own `localStorage` (key `ropes-recovery-v1`).
 
 **Status: finished** (owner, 2026-10-14). `noindex` removed from both pages 2026-10-14, so Google may list them. The amber `.construction` banner was removed the same day (its CSS is kept); the psyphin.co.za card is green "Actively maintained".

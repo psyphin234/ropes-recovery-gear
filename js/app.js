@@ -169,8 +169,23 @@
     $("speedKmh").max = D.speedMaxKmh;
     $("speedKmh").addEventListener("input", (e) => set({ speedKmh: +e.target.value }));
 
+    // The number boxes are type="text" (see C.parseNumber), so the up and down arrows step them here.
+    document.querySelectorAll("input[inputmode]").forEach((input) =>
+      input.addEventListener("keydown", (e) => {
+        if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+        e.preventDefault();
+        const step = Number(input.getAttribute("step")) || 1;
+        const v = C.parseNumber(input.value);
+        let next = (isFinite(v) ? v : 0) + (e.key === "ArrowUp" ? step : -step);
+        if (input.hasAttribute("min")) next = Math.max(Number(input.getAttribute("min")), next);
+        if (input.hasAttribute("max")) next = Math.min(Number(input.getAttribute("max")), next);
+        input.value = String(Math.round(next * 100) / 100);
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      })
+    );
+
     const bindNum = (id, key, allowEmpty) => $(id).addEventListener("input", (e) => {
-      const v = parseFloat(e.target.value);
+      const v = C.parseNumber(e.target.value);
       if (isFinite(v) && v > 0) set({ [key]: v });
       else if (allowEmpty && e.target.value === "") set({ [key]: null });
     });
